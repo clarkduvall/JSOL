@@ -2,90 +2,90 @@
 
 import json
 
-def add(args, env):
-   args = map(lambda x: eval(x, env), args)
+def _add(args, env):
+   args = map(lambda x: _Eval(x, env), args)
    return sum(args)
 
-def sub(args, env):
-   args = map(lambda x: eval(x, env), args)
+def _sub(args, env):
+   args = map(lambda x: _Eval(x, env), args)
    return reduce(lambda x, y: x - y, args)
 
-def mult(args, env):
-   args = map(lambda x: eval(x, env), args)
+def _mult(args, env):
+   args = map(lambda x: _Eval(x, env), args)
    return reduce(lambda x, y: x * y, args)
 
-def div(args, env):
-   args = map(lambda x: eval(x, env), args)
+def _div(args, env):
+   args = map(lambda x: _Eval(x, env), args)
    return reduce(lambda x, y: x / y, args)
 
-def print_(args, env):
-   args = map(lambda x: eval(x, env), args)
+def _print(args, env):
+   args = map(lambda x: _Eval(x, env), args)
    for i in args:
       print i,
    print
    return 0
 
-def lt(args, env):
-   return eval(args[0], env) < eval(args[1], env)
+def _lt(args, env):
+   return _Eval(args[0], env) < _Eval(args[1], env)
 
-def gt(args, env):
-   return eval(args[0], env) > eval(args[1], env)
+def _gt(args, env):
+   return _Eval(args[0], env) > _Eval(args[1], env)
 
-def eq(args, env):
-   return eval(args[0], env) == eval(args[1], env)
+def _eq(args, env):
+   return _Eval(args[0], env) == _Eval(args[1], env)
 
 OPS = {
-   '+': add,
-   '-': sub,
-   '*': mult,
-   '/': div,
-   '<': lt,
-   '>': gt,
-   '=': eq,
-   'print': print_
+   '+': _add,
+   '-': _sub,
+   '*': _mult,
+   '/': _div,
+   '<': _lt,
+   '>': _gt,
+   '=': _eq,
+   'print': _print
 }
 
-def Error(message):
+def _Error(message):
    print message
    exit(0)
 
 def ExecuteStatements(statements, env):
    for statement in statements[:-1]:
-      eval(statement, env)
-   return eval(statements[-1], env)
+      _Eval(statement, env)
+   return _Eval(statements[-1], env)
 
-def IfBlock(exp, env):
-   if eval(exp[1], env):
+def _IfBlock(exp, env):
+   if _Eval(exp[1], env):
       return ExecuteStatements(exp[2], env)
    index = 3
    while exp[index] == 'elif':
-      if eval(exp[index + 1], env):
+      if _Eval(exp[index + 1], env):
          return ExecuteStatements(exp[index + 2], env)
       index += 3
    return ExecuteStatements(exp[-1], env)
 
-def ForBlock(exp, env):
-   eval(exp[1], env)
-   while eval(exp[2], env):
+def _ForBlock(exp, env):
+   _Eval(exp[1], env)
+   while _Eval(exp[2], env):
       ret = ExecuteStatements(exp[-1], env)
-      eval(exp[3], env)
+      _Eval(exp[3], env)
    return ret
 
-def eval(exp, env):
+def _Eval(exp, env):
    if type(exp) == dict and 'def' in exp:
       return ExecuteStatements(exp['def'], env)
    if type(exp) in [int, long, float, bool]:
       return exp
    if type(exp) in [str, unicode]:
       if exp in OPS:
-         Error('%s is a keyword.' % exp)
+         _Error('%s is a keyword.' % exp)
       if exp not in env:
-         Error('Variable %s not bound.' % exp)
+         _Error('Variable %s not bound.' % exp)
       return env[exp]
    elif type(exp) == dict:
       ret = 0
       for var in exp:
-         ret = env[var] = eval(exp[var], env)
+         ret = env[var] = _Eval(exp[var], env)
       return ret
    elif type(exp) == list:
       name = exp[0]
@@ -93,24 +93,27 @@ def eval(exp, env):
       if name in OPS:
          return OPS[name](exp[1:], env)
       if name == 'if':
-         return IfBlock(exp, env)
+         return _IfBlock(exp, env)
       if name == 'for':
-         return ForBlock(exp, env)
+         return _ForBlock(exp, env)
       if name not in env:
-         Error('Function %s not in environment.' % exp)
+         _Error('Function %s not in environment.' % exp)
       f = env[name]
       new_env = {}
       for (p, v) in zip(f['params'], args):
-         new_env[p] = eval(v, env)
-      return eval(f, new_env)
+         new_env[p] = _Eval(v, env)
+      return _Eval(f, new_env)
    else:
-      return eval(exp, env)
-   Error('You shouldn\'t be here! ' + exp.__str__())
+      return _Eval(exp, env)
+   _Error('You shouldn\'t be here! ' + exp.__str__())
+
+def Eval(json_dict):
+   return _Eval(json_dict['main'], json_dict)
 
 def main():
    with open('main.jsol', 'r') as f:
       j = json.load(f)
-      print eval(j['main'], j)
+      print Eval(j)
 
 if __name__ == '__main__':
    main()
