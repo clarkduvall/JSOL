@@ -2,78 +2,78 @@
 
 import json
 
-def _add(args, env):
+def _Add(args, env):
    args = map(lambda x: _Eval(x, env), args)
    return sum(args)
 
-def _sub(args, env):
+def _Sub(args, env):
    args = map(lambda x: _Eval(x, env), args)
    return reduce(lambda x, y: x - y, args)
 
-def _mult(args, env):
+def _Mult(args, env):
    args = map(lambda x: _Eval(x, env), args)
    return reduce(lambda x, y: x * y, args)
 
-def _div(args, env):
+def _Div(args, env):
    args = map(lambda x: _Eval(x, env), args)
    return reduce(lambda x, y: x / y, args)
 
-def _print(args, env):
+def _Print(args, env):
    args = map(lambda x: _Eval(x, env), args)
    for i in args:
       print i,
    print
    return 0
 
-def _lt(args, env):
+def _Lt(args, env):
    return _Eval(args[0], env) < _Eval(args[1], env)
 
-def _gt(args, env):
+def _Gt(args, env):
    return _Eval(args[0], env) > _Eval(args[1], env)
 
-def _eq(args, env):
+def _Eq(args, env):
    return _Eval(args[0], env) == _Eval(args[1], env)
 
 OPS = {
-   '+': _add,
-   '-': _sub,
-   '*': _mult,
-   '/': _div,
-   '<': _lt,
-   '>': _gt,
-   '=': _eq,
-   'print': _print
+   '+': _Add,
+   '-': _Sub,
+   '*': _Mult,
+   '/': _Div,
+   '<': _Lt,
+   '>': _Gt,
+   '=': _Eq,
+   'print': _Print
 }
 
 def _Error(message):
    print message
    exit(0)
 
-def ExecuteStatements(statements, env):
+def _ExecuteStatements(statements, env):
    for statement in statements[:-1]:
       _Eval(statement, env)
    return _Eval(statements[-1], env)
 
 def _IfBlock(exp, env):
    if _Eval(exp[1], env):
-      return ExecuteStatements(exp[2], env)
+      return _ExecuteStatements(exp[2], env)
    index = 3
    while exp[index] == 'elif':
       if _Eval(exp[index + 1], env):
-         return ExecuteStatements(exp[index + 2], env)
+         return _ExecuteStatements(exp[index + 2], env)
       index += 3
-   return ExecuteStatements(exp[-1], env)
+   return _ExecuteStatements(exp[-1], env)
 
 def _ForBlock(exp, env):
    _Eval(exp[1], env)
    while _Eval(exp[2], env):
-      ret = ExecuteStatements(exp[-1], env)
+      ret = _ExecuteStatements(exp[-1], env)
       _Eval(exp[3], env)
    return ret
 
 def _Eval(exp, env):
    if type(exp) == dict and 'def' in exp:
-      return ExecuteStatements(exp['def'], env)
+      return _ExecuteStatements(exp['def'], env)
    if type(exp) in [int, long, float, bool]:
       return exp
    if type(exp) in [str, unicode]:
