@@ -67,9 +67,9 @@ def IfBlock(exp, env):
 def ForBlock(exp, env):
    eval(exp[1], env)
    while eval(exp[2], env):
-      ExecuteStatements(exp[-1], env)
+      ret = ExecuteStatements(exp[-1], env)
       eval(exp[3], env)
-   return 0
+   return ret
 
 def eval(exp, env):
    if type(exp) == dict and 'def' in exp:
@@ -83,7 +83,7 @@ def eval(exp, env):
          Error('Variable %s not bound.' % exp)
       return env[exp]
    elif type(exp) == dict:
-      ret = False
+      ret = 0
       for var in exp:
          ret = env[var] = eval(exp[var], env)
       return ret
