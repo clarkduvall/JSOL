@@ -1,3 +1,11 @@
+JSOL: JSON based programming language.
+
+Example:
+
+ - 'add' -> function definition
+ - '["add", "a", "b", "a"]' -> function call
+ - '{"str": "hello"}' -> string literal
+
 {
   "add": {
     "params": ["l", "b", "c"],
