@@ -4,7 +4,7 @@ import json
 
 def _Add(args, env):
    args = map(lambda x: _Eval(x, env), args)
-   return sum(args)
+   return reduce(lambda x, y: x + y, args)
 
 def _Sub(args, env):
    args = map(lambda x: _Eval(x, env), args)
@@ -83,6 +83,8 @@ def _Eval(exp, env):
          _Error('Variable %s not bound.' % exp)
       return env[exp]
    elif type(exp) == dict:
+      if 'str' in exp:
+         return exp['str']
       ret = 0
       for var in exp:
          ret = env[var] = _Eval(exp[var], env)
