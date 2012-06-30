@@ -2,6 +2,7 @@
 
 import copy
 import json
+import sys
 
 def _Add(args, env):
    args = map(lambda x: _Eval(x, env), args)
@@ -90,10 +91,10 @@ def _Eval(exp, env):
    # basic type
    if _IsFunc(exp, env) or type(exp) in [int, long, float, bool]:
       return exp
-   # function execution
+   # function definition
    if type(exp) == dict and 'def' in exp:
       return exp
-   # variable name
+   # variable
    if type(exp) in [str, unicode]:
       if exp in OPS:
          _Error('%s is a keyword.' % exp, env)
@@ -108,7 +109,7 @@ def _Eval(exp, env):
       for var in exp:
          ret = env[var] = _Eval(exp[var], env)
       return ret
-   # function call
+   # function call/if/for
    elif type(exp) == list:
       name = exp[0]
       args = exp[1:]
@@ -142,7 +143,10 @@ def Eval(json_dict):
    return _ExecuteStatements(json_dict['main']['def'], json_dict)
 
 def main():
-   with open('main.jsol', 'r') as f:
+   if len(sys.argv) != 2:
+      print 'usage: jsol.py <jsol_file>'
+      exit(0)
+   with open(sys.argv[1], 'r') as f:
       j = json.load(f)
       print Eval(j)
 
