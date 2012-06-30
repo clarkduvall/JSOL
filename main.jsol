@@ -7,18 +7,24 @@
     ]
   },
   "eat": {
-    "params": [],
+    "params": ["func"],
     "def": [
-      ["print", 2, 3, 4],
-      ["print", 2, 3, 4],
-      ["print", 2, 3, 4]
+      ["print", ["func", 2.0, 3.3, 4.1]]
     ]
   },
   "main": {
     "def": [
+      {"p": {
+         "params": ["n"],
+         "def": [
+            ["print", "n"]
+         ]
+      }},
+      ["p", {"str": "DID IT"}],
       {"a": ["-", 8, 2, 6]},
-      {"b": ["*", 9, 3, 5]},
+      {"b": ["+", 9, 3, 5]},
       ["print", ["+", {"str": "hello "}, {"str": "world"}]],
+      ["eat", "/"],
       [
         "if", "a", [["eat"]],
         "elif", "b", [["print", 1]],

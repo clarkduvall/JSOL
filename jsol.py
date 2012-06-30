@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import copy
 import json
 
 def _Add(args, env):
@@ -45,8 +46,9 @@ OPS = {
    'print': _Print
 }
 
-def _Error(message):
-   print message
+def _Error(message, code):
+   print '%s: ' % message,
+   print code
    exit(0)
 
 def _ExecuteStatements(statements, env):
@@ -55,33 +57,50 @@ def _ExecuteStatements(statements, env):
    return _Eval(statements[-1], env)
 
 def _IfBlock(exp, env):
-   if _Eval(exp[1], env):
-      return _ExecuteStatements(exp[2], env)
-   index = 3
-   while exp[index] == 'elif':
-      if _Eval(exp[index + 1], env):
-         return _ExecuteStatements(exp[index + 2], env)
-      index += 3
-   return _ExecuteStatements(exp[-1], env)
+   try:
+      if _Eval(exp[1], env):
+         return _ExecuteStatements(exp[2], env)
+      index = 3
+      while exp[index] == 'elif':
+         if _Eval(exp[index + 1], env):
+            return _ExecuteStatements(exp[index + 2], env)
+         index += 3
+      return _ExecuteStatements(exp[-1], env)
+   except:
+      _Error('if', exp)
 
 def _ForBlock(exp, env):
-   _Eval(exp[1], env)
-   while _Eval(exp[2], env):
-      ret = _ExecuteStatements(exp[-1], env)
-      _Eval(exp[3], env)
-   return ret
+   try:
+      _Eval(exp[1], env)
+      while _Eval(exp[2], env):
+         ret = _ExecuteStatements(exp[-1], env)
+         _Eval(exp[3], env)
+      return ret
+   except:
+      _Error('for', exp)
+
+def _IsFunc(exp, env):
+   try:
+      return type(exp) in [str, unicode] and (
+          exp in OPS or exp in env and 'def' in env[exp])
+   except:
+      return False
 
 def _Eval(exp, env):
-   if type(exp) == dict and 'def' in exp:
-      return _ExecuteStatements(exp['def'], env)
-   if type(exp) in [int, long, float, bool]:
+   # basic type
+   if _IsFunc(exp, env) or type(exp) in [int, long, float, bool]:
       return exp
+   # function execution
+   if type(exp) == dict and 'def' in exp:
+      return exp
+   # variable name
    if type(exp) in [str, unicode]:
       if exp in OPS:
-         _Error('%s is a keyword.' % exp)
+         _Error('%s is a keyword.' % exp, env)
       if exp not in env:
-         _Error('Variable %s not bound.' % exp)
+         _Error('Variable %s not bound.' % exp, env)
       return env[exp]
+   # string literal or assignment
    elif type(exp) == dict:
       if 'str' in exp:
          return exp['str']
@@ -89,28 +108,38 @@ def _Eval(exp, env):
       for var in exp:
          ret = env[var] = _Eval(exp[var], env)
       return ret
+   # function call
    elif type(exp) == list:
       name = exp[0]
       args = exp[1:]
-      if name in OPS:
-         return OPS[name](exp[1:], env)
+      # if statement
       if name == 'if':
          return _IfBlock(exp, env)
+      # for loop
       if name == 'for':
          return _ForBlock(exp, env)
-      if name not in env:
-         _Error('Function %s not in environment.' % exp)
-      f = env[name]
-      new_env = {}
+      if name not in env and name not in OPS:
+         _Error('Function %s not in environment.' % exp, env)
+      # evaluate function name
+      while not _IsFunc(name, env):
+         name = _Eval(name, env)
+      # built in function
+      if name in OPS:
+         return OPS[name](exp[1:], copy.copy(env))
+      # function in environment
+      else:
+         f = env[name]
+      # run function in copied env
+      new_env = copy.copy(env)
       for (p, v) in zip(f['params'], args):
          new_env[p] = _Eval(v, env)
-      return _Eval(f, new_env)
+      return _ExecuteStatements(f['def'], new_env)
+   # try to evaluate anything else
    else:
       return _Eval(exp, env)
-   _Error('You shouldn\'t be here! ' + exp.__str__())
 
 def Eval(json_dict):
-   return _Eval(json_dict['main'], json_dict)
+   return _ExecuteStatements(json_dict['main']['def'], json_dict)
 
 def main():
    with open('main.jsol', 'r') as f:
