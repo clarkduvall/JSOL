@@ -25,7 +25,7 @@ Syntax
 
  - '["for", <exp>, <cond>, <exp>,
        [...]
-   ]'                                                    -> for loop
+    ]'                                                    -> for loop
 
  - '["if", <cond>, [...], "elif", <cond>, [...], "else",
       [...]
