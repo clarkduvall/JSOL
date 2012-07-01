@@ -25,7 +25,7 @@ Syntax
 
  - '["for", <exp>, <cond>, <exp>,
        [...]
-   ]'                                                    -> for loop
+    ]'                                                    -> for loop
 
  - '["if", <cond>, [...], "elif", <cond>, [...], "else",
       [...]
@@ -35,6 +35,7 @@ Syntax
 Examples
 
 The examples/ directory has some example programs.
+Run examples by typing 'jsol.py examples/<name_of_example>'
 
    - fib.jsol - outputs the Fibonacci sequence using a closure
    - main.jsol - example of all the language elements
