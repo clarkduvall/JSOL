@@ -9,26 +9,22 @@ Features
 
  - Closures
  - First class functions
- - string and number types
+ - string list, number, and function types
  - fully representable in JSON.
 
 
 Syntax
 
  - '{"a": 5}'                                            -> assignment
-
  - '"add": {...}'                                        -> function definition
-
  - '["add", "a", "b", "a"]'                              -> function call
-
- - '{"str": "hello"}'                                    -> string literal
-
- - '["for", <exp>, <cond>, <exp>,
-       [...]
-    ]'                                                    -> for loop
-
- - '["if", <cond>, [...], "elif", <cond>, [...], "else",
-       [...]
+ - '{"lit": "hello"}'                                    -> string literal
+ - '{"lit": [1, 2, 3]}'                                  -> list literal
+ - '["for", <exp>, <cond>, <exp>,                        |
+       [...]                                             |
+    ]'                                                   -> for loop
+ - '["if", <cond>, [...], "elif", <cond>, [...], "else", |
+       [...]                                             |
     ]'                                                   -> if/else
 
 
@@ -48,4 +44,6 @@ Use the run_tests.sh script to run unit tests.
 
 Future
 
-Hopefully, the interpreter will be ported to a variety of languages.
+ - Better error handling/messages.
+ - Dictionary type?
+ - Hopefully, the interpreter will be ported to a variety of languages.
