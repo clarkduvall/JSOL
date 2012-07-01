@@ -4,37 +4,49 @@ import copy
 import json
 import sys
 
+def EvalList(l, env):
+   return map(lambda x: _Eval(x, env), l)
+
 def _Add(args, env):
-   args = map(lambda x: _Eval(x, env), args)
+   args = EvalList(args, env)
    return reduce(lambda x, y: x + y, args)
 
 def _Sub(args, env):
-   args = map(lambda x: _Eval(x, env), args)
+   args = EvalList(args, env)
    return reduce(lambda x, y: x - y, args)
 
 def _Mult(args, env):
-   args = map(lambda x: _Eval(x, env), args)
+   args = EvalList(args, env)
    return reduce(lambda x, y: x * y, args)
 
 def _Div(args, env):
-   args = map(lambda x: _Eval(x, env), args)
+   args = EvalList(args, env)
    return reduce(lambda x, y: x / y, args)
 
 def _Print(args, env):
-   args = map(lambda x: _Eval(x, env), args)
+   args = EvalList(args, env)
    for i in args:
       print i,
    print
    return 0
 
+def ListChecker(l, f):
+   return all(f(l[i], l[i + 1]) for i in xrange(len(l) - 1))
+
 def _Lt(args, env):
-   return _Eval(args[0], env) < _Eval(args[1], env)
+   args = EvalList(args, env)
+   return ListChecker(args, lambda x, y: x < y)
 
 def _Gt(args, env):
-   return _Eval(args[0], env) > _Eval(args[1], env)
+   args = EvalList(args, env)
+   return ListChecker(args, lambda x, y: x > y)
 
 def _Eq(args, env):
-   return _Eval(args[0], env) == _Eval(args[1], env)
+   args = EvalList(args, env)
+   return ListChecker(args, lambda x, y: x == y)
+
+def _NEq(args, env):
+   return not _Eq(args, env)
 
 OPS = {
    '+': _Add,
@@ -44,6 +56,7 @@ OPS = {
    '<': _Lt,
    '>': _Gt,
    '=': _Eq,
+   '!': _NEq,
    'print': _Print
 }
 
@@ -82,8 +95,7 @@ def _ForBlock(exp, env):
 
 def _IsFunc(exp, env):
    try:
-      return type(exp) in [str, unicode] and (
-          exp in OPS or exp in env and 'def' in env[exp])
+      return type(exp) == tuple or (type(exp) in [str, unicode] and exp in OPS)
    except:
       return False
 
@@ -93,7 +105,7 @@ def _Eval(exp, env):
       return exp
    # function definition
    if type(exp) == dict and 'def' in exp:
-      return exp
+      return (exp, copy.copy(env))
    # variable
    if type(exp) in [str, unicode]:
       if exp in OPS:
@@ -122,25 +134,28 @@ def _Eval(exp, env):
       if name not in env and name not in OPS:
          _Error('Function %s not in environment.' % exp, env)
       # evaluate function name
-      while not _IsFunc(name, env):
-         name = _Eval(name, env)
+      f = name
+      while not _IsFunc(f, env):
+         f = _Eval(name, env)
       # built in function
-      if name in OPS:
-         return OPS[name](exp[1:], copy.copy(env))
+      if type(f) != tuple and f in OPS:
+         return OPS[f](exp[1:], env)
       # function in environment
       else:
-         f = env[name]
+         body = f[0]
       # run function in copied env
-      new_env = copy.copy(env)
-      for (p, v) in zip(f['params'], args):
-         new_env[p] = _Eval(v, env)
-      return _ExecuteStatements(f['def'], new_env)
+      for (p, v) in zip(body['params'], args):
+         f[1][p] = _Eval(v, f[1])
+      return _ExecuteStatements(body['def'], f[1])
    # try to evaluate anything else
    else:
       return _Eval(exp, env)
 
-def Eval(json_dict):
-   return _ExecuteStatements(json_dict['main']['def'], json_dict)
+def Eval(json_dict, env=None):
+   if not env:
+      env = {}
+   _Eval(json_dict, env)
+   return _ExecuteStatements(json_dict['main']['def'], env)
 
 def main():
    if len(sys.argv) != 2:
@@ -148,7 +163,7 @@ def main():
       exit(0)
    with open(sys.argv[1], 'r') as f:
       j = json.load(f)
-      print Eval(j)
+      exit(Eval(j))
 
 if __name__ == '__main__':
    main()
