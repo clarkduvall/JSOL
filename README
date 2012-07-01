@@ -28,7 +28,7 @@ Syntax
     ]'                                                    -> for loop
 
  - '["if", <cond>, [...], "elif", <cond>, [...], "else",
-      [...]
+       [...]
     ]'                                                   -> if/else
 
 
