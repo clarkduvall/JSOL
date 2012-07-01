@@ -1,9 +1,10 @@
 {
    "main": {
       "def": [
-         ["assert", [1, 2, 3], ["+",{"lit": [1, 2]}, {"lit": [3]}]],
-         ["assert", "hello world!", ["+", {"lit": "hello "}, {"lit": "world"}]],
+         ["assert", {"lit": [1, 2, 3]}, ["+",{"lit": [1, 2]}, {"lit": [3]}]],
+         ["assert", {"lit": "hello world!"}, ["+", {"lit": "hello "}, {"lit": "world!"}]],
          ["assert", 5, ["+",{"lit": 2}, {"lit": 3}]],
+         ["assert", 4, ["len", {"lit": [1, 2, 3, 4]}]],
          0
       ]
    }

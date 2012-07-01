@@ -49,6 +49,11 @@ def _Assert(args, env):
       print 'Assert failed: ',
       print args
 
+def _Len(args, env):
+   args = EvalList(args, env)
+   lens = map(len, args)
+   return sum(lens)
+
 def ListChecker(l, f):
    return all(f(l[i], l[i + 1]) for i in xrange(len(l) - 1))
 
@@ -77,7 +82,8 @@ OPS = {
    '=': _Eq,
    '!': _NEq,
    'print': _Print,
-   'assert': _Assert
+   'assert': _Assert,
+   'len': _Len
 }
 
 def _Error(message, code):

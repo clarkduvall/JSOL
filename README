@@ -39,7 +39,7 @@ Run examples by typing 'jsol.py examples/<name_of_example>'
 
 Testing
 
-Use the run_tests.sh script to run unit tests.
+Run tests by typing 'jsol.py test_data/<name_of_test>'
 
 
 Future
