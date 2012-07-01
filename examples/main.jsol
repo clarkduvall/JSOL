@@ -18,14 +18,15 @@
          "p": {
             "params": ["n"],
             "def": [
-               ["print", ["+", {"str": "I "}, "n"]]
+               ["print", ["+", {"lit": "I "}, "n"]]
             ]
          }
       },
-      ["p", {"str": "DID IT"}],
+      ["p", {"lit": "DID IT"}],
+      ["print", {"lit": [1, 2, 3]}],
       {"a": ["+", 8, 2, 6]},
       {"b": ["+", 9, 3, 5]},
-      ["print", ["+", {"str": "hello "}, {"str": "world"}]],
+      ["print", ["+", {"lit": "hello "}, {"lit": "world"}]],
       ["eat", "/"],
       [
         "if", "a", [["eat"]],

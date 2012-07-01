@@ -135,8 +135,8 @@ def _Eval(exp, env):
       return env[exp]
    # string literal or assignment
    elif type(exp) == dict:
-      if 'str' in exp:
-         return exp['str']
+      if 'lit' in exp:
+         return exp['lit']
       ret = 0
       for var in exp:
          ret = env[var] = _Eval(exp[var], env)
