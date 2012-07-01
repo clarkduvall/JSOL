@@ -4,6 +4,7 @@ JSOL is an interpreted language represented by JSON. Since any JSOL program
 is completely written in JSON, it is very serializable. This allows for easy
 passing of complete programs between applications.
 
+
 Features
 
  - Closures
@@ -11,16 +12,25 @@ Features
  - string and number types
  - fully representable in JSON.
 
+
 Syntax
 
  - '{"a": 5}'                                            -> assignment
+
  - '"add": {...}'                                        -> function definition
+
  - '["add", "a", "b", "a"]'                              -> function call
+
  - '{"str": "hello"}'                                    -> string literal
- - '["for", <exp>, <cond>, <exp>, [...]]'                -> for loop
+
+ - '["for", <exp>, <cond>, <exp>,
+       [...]
+   ]'                                                    -> for loop
+
  - '["if", <cond>, [...], "elif", <cond>, [...], "else",
       [...]
     ]'                                                   -> if/else
+
 
 Examples
 
@@ -29,9 +39,11 @@ The examples/ directory has some example programs.
    - fib.jsol - outputs the Fibonacci sequence using a closure
    - main.jsol - example of all the language elements
 
+
 Testing
 
 Use the run_tests.sh script to run unit tests.
+
 
 Future
 
