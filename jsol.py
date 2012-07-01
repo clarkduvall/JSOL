@@ -30,6 +30,11 @@ def _Print(args, env):
    print
    return 0
 
+def _Assert(args, env):
+   if not _Eq(args[:], env):
+      print 'Assert failed: ',
+      print args
+
 def ListChecker(l, f):
    return all(f(l[i], l[i + 1]) for i in xrange(len(l) - 1))
 
@@ -57,7 +62,8 @@ OPS = {
    '>': _Gt,
    '=': _Eq,
    '!': _NEq,
-   'print': _Print
+   'print': _Print,
+   'assert': _Assert
 }
 
 def _Error(message, code):
@@ -155,15 +161,20 @@ def Eval(json_dict, env=None):
    if not env:
       env = {}
    _Eval(json_dict, env)
+   for func in env:
+      if type(env[func]) == tuple:
+         env[func] = (env[func][0], env)
    return _ExecuteStatements(json_dict['main']['def'], env)
 
 def main():
-   if len(sys.argv) != 2:
-      print 'usage: jsol.py <jsol_file>'
+   if len(sys.argv) < 2:
+      print 'usage: jsol.py <jsol_files>'
       exit(0)
-   with open(sys.argv[1], 'r') as f:
-      j = json.load(f)
-      exit(Eval(j))
+   for arg in sys.argv[1:]:
+      print 'Running ' + arg
+      with open(sys.argv[1], 'r') as f:
+         j = json.load(f)
+         Eval(j)
 
 if __name__ == '__main__':
    main()

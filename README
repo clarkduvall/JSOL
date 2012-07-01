@@ -1,45 +1,38 @@
-JSOL: JSON based programming language.
+JSOL: JavaScript Object Language
 
-Example:
+JSOL is an interpreted language represented by JSON. Since any JSOL program
+is completely written in JSON, it is very serializable. This allows for easy
+passing of complete programs between applications.
 
- - '"add": {...}' -> function definition
- - '["add", "a", "b", "a"]' -> function call
- - '{"str": "hello"}' -> string literal
- - '["for", <exp>, <cond>, <exp>, [...]]' -> for loop
- - '["if", <cond>, [...], "elif", <cond>, [...], "else", [...]]' -> if/else
+Features
 
-{
-  "add": {
-    "params": ["l", "b", "c"],
-    "def": [
-      {"w": ["+", "l", "b", "c"]},
-      "w"
-    ]
-  },
-  "eat": {
-    "params": [],
-    "def": [
-      ["print", 2, 3, 4],
-      ["print", 2, 3, 4],
-      ["print", 2, 3, 4]
-    ]
-  },
-  "main": {
-    "def": [
-      {"a": ["-", 8, 2, 6]},
-      {"b": ["*", 9, 3, 5]},
-      ["print", ["+", {"str": "hello "}, {"str": "world"}]],
-      [
-        "if", "a", [["eat"]],
-        "elif", "b", [["print", 1]],
-        "else", [["print", 2]]
-      ],
-      [
-        "for", {"i": 0}, ["<", "i", 5], {"i": ["+", "i", 1]},
-          [["print", 0]]
-      ],
-      {"c": ["add", "a", "b", "a"]},
-      "c"
-    ]
-  }
-}
+ - Closures
+ - First class functions
+ - string and number types
+ - fully representable in JSON.
+
+Syntax
+
+ - '{"a": 5}'                                            -> assignment
+ - '"add": {...}'                                        -> function definition
+ - '["add", "a", "b", "a"]'                              -> function call
+ - '{"str": "hello"}'                                    -> string literal
+ - '["for", <exp>, <cond>, <exp>, [...]]'                -> for loop
+ - '["if", <cond>, [...], "elif", <cond>, [...], "else",
+      [...]
+    ]'                                                   -> if/else
+
+Examples
+
+The examples/ directory has some example programs.
+
+   - fib.jsol - outputs the Fibonacci sequence using a closure
+   - main.jsol - example of all the language elements
+
+Testing
+
+Use the run_tests.sh script to run unit tests.
+
+Future
+
+Hopefully, the interpreter will be ported to a variety of languages.
