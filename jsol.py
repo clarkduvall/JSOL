@@ -54,20 +54,24 @@ def _Len(args, env):
    lens = map(len, args)
    return sum(lens)
 
-def ListChecker(l, f):
+def ListChecker(args, env, f):
+   l = EvalList(args, env)
    return all(f(l[i], l[i + 1]) for i in xrange(len(l) - 1))
 
 def _Lt(args, env):
-   args = EvalList(args, env)
-   return ListChecker(args, lambda x, y: x < y)
+   return ListChecker(args, env, lambda x, y: x < y)
 
 def _Gt(args, env):
-   args = EvalList(args, env)
-   return ListChecker(args, lambda x, y: x > y)
+   return ListChecker(args, env, lambda x, y: x > y)
+
+def _LtE(args, env):
+   return ListChecker(args, env, lambda x, y: x <= y)
+
+def _GtE(args, env):
+   return ListChecker(args, env, lambda x, y: x >= y)
 
 def _Eq(args, env):
-   args = EvalList(args, env)
-   return ListChecker(args, lambda x, y: x == y)
+   return ListChecker(args, env, lambda x, y: x == y)
 
 def _NEq(args, env):
    return not _Eq(args, env)
@@ -79,6 +83,8 @@ OPS = {
    '/': _Div,
    '<': _Lt,
    '>': _Gt,
+   '<=': _LtE,
+   '>=': _GtE,
    '=': _Eq,
    '!': _NEq,
    'print': _Print,
@@ -87,8 +93,7 @@ OPS = {
 }
 
 def _Error(message, code):
-   print message + ': ',
-   print code
+   print message + ': ', code
    exit(0)
 
 def _ExecuteStatements(statements, env):
@@ -135,9 +140,9 @@ def _Eval(exp, env):
    # variable
    if type(exp) in [str, unicode]:
       if exp in OPS:
-         _Error('%s is a keyword.' % exp, env)
+         _Error('%s is a keyword' % exp, env)
       if exp not in env:
-         _Error('Variable %s not bound.' % exp, env)
+         _Error('Variable %s not bound' % exp, env)
       return env[exp]
    # string literal or assignment
    elif type(exp) == dict:
@@ -167,12 +172,9 @@ def _Eval(exp, env):
       if type(f) != tuple and f in OPS:
          return OPS[f](exp[1:], env)
       # function in environment
-      else:
-         body = f[0]
-      # run function in copied env
-      for (p, v) in zip(body['params'], args):
+      for (p, v) in zip(f[0]['params'], args):
          f[1][p] = _Eval(v, f[1])
-      return _ExecuteStatements(body['def'], f[1])
+      return _ExecuteStatements(f[0]['def'], f[1])
    # try to evaluate anything else
    else:
       return _Eval(exp, env)
@@ -191,7 +193,6 @@ def main():
       print 'usage: jsol.py <jsol_files>'
       exit(0)
    for arg in sys.argv[1:]:
-      print 'Running ' + arg
       with open(sys.argv[1], 'r') as f:
          j = json.load(f)
          Eval(j)
