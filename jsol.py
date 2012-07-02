@@ -46,8 +46,7 @@ def _Print(args, env):
 
 def _Assert(args, env):
    if not _Eq(args[:], env):
-      print 'Assert failed: ',
-      print args
+      print 'Assert failed: ', args
 
 def _Len(args, env):
    args = EvalList(args, env)
