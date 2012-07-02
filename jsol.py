@@ -87,7 +87,7 @@ OPS = {
 }
 
 def _Error(message, code):
-   print '%s: ' % message,
+   print message + ': ',
    print code
    exit(0)
 
