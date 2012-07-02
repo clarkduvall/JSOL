@@ -76,19 +76,9 @@ def _NEq(args, env):
    return not _Eq(args, env)
 
 OPS = {
-   '+': _Add,
-   '-': _Sub,
-   '*': _Mult,
-   '/': _Div,
-   '<': _Lt,
-   '>': _Gt,
-   '<=': _LtE,
-   '>=': _GtE,
-   '=': _Eq,
-   '!': _NEq,
-   'print': _Print,
-   'assert': _Assert,
-   'len': _Len
+   '+': _Add, '-': _Sub, '*': _Mult, '/': _Div,
+   '<': _Lt, '>': _Gt, '<=': _LtE, '>=': _GtE, '=': _Eq, '!': _NEq,
+   'print': _Print, 'assert': _Assert, 'len': _Len
 }
 
 def _Error(message, code):
