@@ -21,21 +21,21 @@ import sys
 def EvalList(l, env):
    return map(lambda x: _Eval(x, env), l)
 
-def _Add(args, env):
+def _Arithmetic(args, env, f):
    args = EvalList(args, env)
-   return reduce(lambda x, y: x + y, args)
+   return reduce(f, args)
+
+def _Add(args, env):
+   return _Arithmetic(args, env, lambda x, y: x + y)
 
 def _Sub(args, env):
-   args = EvalList(args, env)
-   return reduce(lambda x, y: x - y, args)
+   return _Arithmetic(args, env, lambda x, y: x - y)
 
 def _Mult(args, env):
-   args = EvalList(args, env)
-   return reduce(lambda x, y: x * y, args)
+   return _Arithmetic(args, env, lambda x, y: x * y)
 
 def _Div(args, env):
-   args = EvalList(args, env)
-   return reduce(lambda x, y: x / y, args)
+   return _Arithmetic(args, env, lambda x, y: x / y)
 
 def _Print(args, env):
    args = EvalList(args, env)
