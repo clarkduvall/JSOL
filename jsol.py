@@ -53,6 +53,14 @@ def _Len(args, env):
    lens = map(len, args)
    return sum(lens)
 
+def _Ins(args, env):
+   args = EvalList(args, env)
+   return args[0].insert(args[1], args[2])
+
+def _Del(args, env):
+   args = EvalList(args, env)
+   return args[0].pop(args[1])
+
 def ListChecker(args, env, f):
    l = EvalList(args, env)
    return all(f(l[i], l[i + 1]) for i in xrange(len(l) - 1))
@@ -78,7 +86,7 @@ def _NEq(args, env):
 OPS = {
    '+': _Add, '-': _Sub, '*': _Mult, '/': _Div,
    '<': _Lt, '>': _Gt, '<=': _LtE, '>=': _GtE, '=': _Eq, '!': _NEq,
-   'print': _Print, 'assert': _Assert, 'len': _Len
+   'print': _Print, 'assert': _Assert, 'len': _Len, 'ins': _Ins, 'del': _Del
 }
 
 def _Error(message, code):
@@ -110,7 +118,7 @@ def _ForBlock(exp, env):
          ret = _ExecuteStatements(exp[-1], env)
          _Eval(exp[3], env)
       return ret
-   except:
+   except Exception as e:
       _Error('for', exp)
 
 def _IsFunc(exp, env):
@@ -119,10 +127,31 @@ def _IsFunc(exp, env):
    except:
       return False
 
+def _IsBasic(exp, env):
+   return _IsFunc(exp, env) or (type(exp) in [int, long, float, bool]) or (
+       type(exp) == dict and 'lit' in exp)
+
+def _GetBasic(exp, env):
+   if type(exp) == dict and 'lit' in exp:
+      lit = exp['lit']
+      if type(lit) == list:
+         for i in range(len(lit)):
+            if not _IsBasic(lit[i], env):
+               lit[i] = _Eval(lit[i], env)
+      if type(lit) == dict:
+         new_env = copy.copy(env)
+         _Eval(lit, new_env)
+         for func in new_env:
+            if type(new_env[func]) == tuple:
+               new_env[func] = (new_env[func][0], new_env)
+         return new_env
+      return lit
+   return exp
+
 def _Eval(exp, env):
    # basic type
-   if _IsFunc(exp, env) or type(exp) in [int, long, float, bool]:
-      return exp
+   if _IsBasic(exp, env):
+      return _GetBasic(exp, env)
    # function definition
    if type(exp) == dict and 'def' in exp:
       return (exp, copy.copy(env))
@@ -135,8 +164,6 @@ def _Eval(exp, env):
       return env[exp]
    # string literal or assignment
    elif type(exp) == dict:
-      if 'lit' in exp:
-         return exp['lit']
       ret = 0
       for var in exp:
          ret = env[var] = _Eval(exp[var], env)
@@ -151,15 +178,16 @@ def _Eval(exp, env):
       # for loop
       if name == 'for':
          return _ForBlock(exp, env)
-      if name not in env and name not in OPS:
-         _Error('Function %s not in environment.' % exp, env)
       # evaluate function name
-      f = name
-      while not _IsFunc(f, env):
-         f = _Eval(name, env)
+      f = _Eval(name, env)
       # built in function
-      if type(f) != tuple and f in OPS:
+      if type(f) in [str, unicode] and f in OPS:
          return OPS[f](exp[1:], env)
+      if not _IsFunc(f, env):
+         if len(args) == 2:
+            f[_Eval(args[0], env)] = args[1]
+            return args[1]
+         return _Eval(f[_Eval(args[0], env)], env)
       # function in environment
       for (p, v) in zip(f[0]['params'], args):
          f[1][p] = _Eval(v, f[1])
