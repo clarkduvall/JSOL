@@ -16,6 +16,7 @@
 
 import copy
 import json
+import random
 import sys
 
 def EvalList(l, env):
@@ -62,6 +63,10 @@ def _Del(args, env):
    args = EvalList(args, env)
    return args[0].pop(args[1])
 
+def _Rand(args, env):
+   args = EvalList(args, env)
+   return random.randint(args[0], args[1])
+
 def ListChecker(args, env, f):
    l = EvalList(args, env)
    return all(f(l[i], l[i + 1]) for i in xrange(len(l) - 1))
@@ -87,7 +92,8 @@ def _NEq(args, env):
 OPS = {
    '+': _Add, '-': _Sub, '*': _Mult, '/': _Div,
    '<': _Lt, '>': _Gt, '<=': _LtE, '>=': _GtE, '=': _Eq, '!': _NEq,
-   'print': _Print, 'assert': _Assert, 'len': _Len, 'ins': _Ins, 'del': _Del
+   'print': _Print, 'assert': _Assert, 'len': _Len, 'ins': _Ins, 'del': _Del,
+   'rand': _Rand
 }
 
 def _Error(message, code):
@@ -190,7 +196,10 @@ def _Eval(exp, env):
             val = _Eval(args[1], env)
             f[_Eval(args[0], env)] = val
             return val
-         return f[_Eval(args[0], env)]
+         val = f[_Eval(args[0], env)]
+         if _IsBasic(val, env):
+            return _Eval(val, env)
+         return val
       # function in environment
       for (p, v) in zip(f[0]['params'], args):
          f[1][p] = _Eval(v, f[1])

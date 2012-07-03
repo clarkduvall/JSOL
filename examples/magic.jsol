@@ -1,0 +1,25 @@
+{
+   "8ball": {"lit": {
+      "answers": {"lit": [
+         {"lit": "yes"},
+         {"lit": "no"},
+         {"lit": "maybe"},
+         {"lit": "never"},
+         {"lit": "you crazy!"}
+      ]},
+      "ask": {
+         "params": [],
+         "def": [
+            ["answers", ["rand", 0, ["-", ["len", "answers"], 1]]]
+         ]
+      }
+   }},
+   "main": {
+      "def": [
+         ["print", {"lit": "Magic 8 Ball says:"}],
+         ["print", [["8ball", {"lit": "ask"}]]],
+         ["print", [["8ball", {"lit": "ask"}]]],
+         ["print", [["8ball", {"lit": "ask"}]]]
+      ]
+   }
+}
