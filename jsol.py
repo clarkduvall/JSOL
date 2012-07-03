@@ -55,7 +55,8 @@ def _Len(args, env):
 
 def _Ins(args, env):
    args = EvalList(args, env)
-   return args[0].insert(args[1], args[2])
+   args[0].insert(args[1], args[2])
+   return args[2]
 
 def _Del(args, env):
    args = EvalList(args, env)
@@ -91,6 +92,7 @@ OPS = {
 
 def _Error(message, code):
    print message + ': ', code
+   print
    exit(0)
 
 def _ExecuteStatements(statements, env):
@@ -185,9 +187,10 @@ def _Eval(exp, env):
          return OPS[f](exp[1:], env)
       if not _IsFunc(f, env):
          if len(args) == 2:
-            f[_Eval(args[0], env)] = args[1]
-            return args[1]
-         return _Eval(f[_Eval(args[0], env)], env)
+            val = _Eval(args[1], env)
+            f[_Eval(args[0], env)] = val
+            return val
+         return f[_Eval(args[0], env)]
       # function in environment
       for (p, v) in zip(f[0]['params'], args):
          f[1][p] = _Eval(v, f[1])
@@ -210,7 +213,7 @@ def main():
       print 'usage: jsol.py <jsol_files>'
       exit(0)
    for arg in sys.argv[1:]:
-      with open(sys.argv[1], 'r') as f:
+      with open(arg, 'r') as f:
          j = json.load(f)
          Eval(j)
 

@@ -1,6 +1,7 @@
 {
    "main": {
       "def": [
+         ["print", {"lit": "Running op_test..."}],
          ["assert", 1, ["<", 1, 3, 4]],
          ["assert", 0, [">", 1, 3, 4]],
          ["assert", 0, ["<", 5, 3, 4]],

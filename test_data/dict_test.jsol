@@ -1,0 +1,56 @@
+{
+   "main": {
+      "def": [
+         ["print", {"lit": "Running dict_test..."}],
+         {"d1": {"lit": {
+            "a": 10,
+            "f": {
+               "params": [],
+               "def": [
+                  "a"
+               ]
+            }
+         }}},
+         {"d2": {"lit": {
+            "l": {"lit": [1, 2, 3]},
+            "d": {"lit": {
+               "a": 1,
+               "x": 20
+            }},
+            "set_a": {
+               "params": ["a_"],
+               "def": [
+                  ["d", {"lit": "a"}, "a_"]
+               ]
+            },
+            "get_a": {
+               "params": [],
+               "def": [
+                  ["d", {"lit": "a"}]
+               ]
+            },
+            "f": {
+               "params": [],
+               "def": [
+                  ["+", ["d", {"lit": "x"}], ["d", {"lit": "a"}]]
+               ]
+            }
+         }}},
+         ["assert", 10, [["d1", {"lit": "f"}]]],
+         ["assert", 10, ["d1", {"lit": "a"}]],
+         ["assert", 9, ["d1", {"lit": "a"}, 9]],
+         ["assert", 9, [["d1", {"lit": "f"}]]],
+         ["assert", 2, ["d1", {"lit": "b"}, 2]],
+         ["assert", 2, ["d1", {"lit": "b"}]],
+         ["assert", 21, [["d2", {"lit": "f"}]]],
+         ["assert", 1, [["d2", {"lit": "get_a"}]]],
+         ["assert", 32, [["d2", {"lit": "set_a"}], 32]],
+         ["assert", 32, [["d2", {"lit": "get_a"}]]],
+         ["assert", 32, [["d2", {"lit": "d"}], {"lit": "a"}]],
+         ["assert", {"lit": [1, 2, 3]}, ["d2", {"lit": "l"}]],
+         ["assert", 5, ["ins", ["d2", {"lit": "l"}], 0, 5]],
+         ["assert", 4, ["len", ["d2", {"lit": "l"}]]],
+         0
+      ]
+   }
+}

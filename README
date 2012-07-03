@@ -11,23 +11,41 @@ Features
 
  - Closures
  - First class functions
- - string, list, number, and function types
+ - string, list, number, dictionary, and function types
  - fully representable in JSON.
 
 
 Syntax
 
- - '{"a": 5}'                                            -> assignment
- - '"add": {...}'                                        -> function definition
- - '["add", "a", "b", "a"]'                              -> function call
- - '{"lit": "hello"}'                                    -> string literal
- - '{"lit": [1, 2, 3]}'                                  -> list literal
- - '["for", <exp>, <cond>, <exp>,                        |
-       [...]                                             |
-    ]'                                                   -> for loop
- - '["if", <cond>, [...], "elif", <cond>, [...], "else", |
-       [...]                                             |
-    ]'                                                   -> if/else
+   Basic
+    - '{"a": 5}'                     -> assignment
+    - '"add": {...}'                 -> function definition
+    - '["add", "a", "b", "a"]'       -> function call
+    - '{"lit": "hello"}'             -> string literal
+
+   Lists
+    - '{"lit": [1, 2, 3]}'           -> list literal
+    - '["l", 0]'                     -> get first element in list
+    - '["l", 0, 5]'                  -> set first element in list to be 5
+    - '["del", "l", 0]'              -> delete and return first element in list
+    - '["ins", "l", 0, 5]'           -> insert 5 into the beginning of the list
+
+   Dictionaries
+    - '{"lit": {"a": 5, "b": 2}}'    -> dictionary literal
+    - '["d", {"lit": "a"}]'          -> get the value with the key "a"
+    - '["d", {"lit": "a"}, 5]'       -> set "a" to be 5 in the dictionary
+
+   For/If blocks
+    - '["for", <exp>, <cond>, <exp>, |
+          [...]                      |
+       ]'                            -> for loop
+    - '["if", <cond>,                |
+          [...],                     |
+        "elif", <cond>,              |
+          [...],                     |
+        "else",                      |
+          [...]                      |
+       ]'                            -> if/else
 
 
 Examples
@@ -47,5 +65,5 @@ Run tests by typing 'jsol.py test_data/<name_of_test>'
 Future
 
  - Better error handling/messages.
- - Dictionary type?
+ - More examples
  - Hopefully, the interpreter will be ported to a variety of languages.
