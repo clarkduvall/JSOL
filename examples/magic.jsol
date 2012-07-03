@@ -19,7 +19,8 @@
          ["print", {"lit": "Magic 8 Ball says:"}],
          ["print", [["8ball", {"lit": "ask"}]]],
          ["print", [["8ball", {"lit": "ask"}]]],
-         ["print", [["8ball", {"lit": "ask"}]]]
+         ["print", [["8ball", {"lit": "ask"}]]],
+         0
       ]
    }
 }

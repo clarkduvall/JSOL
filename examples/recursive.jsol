@@ -1,0 +1,16 @@
+{
+   "counter": 25,
+   "rec": {
+      "params": [],
+      "def": [
+         ["print", {"lit": "hi"}, "counter"],
+         ["if", [">", {"counter": ["-", "counter", 1]}, 0], [["rec"]]],
+         0
+      ]
+   },
+   "main": {
+      "def": [
+         ["rec"]
+      ]
+   }
+}

@@ -110,6 +110,8 @@ def _IfBlock(exp, env):
    try:
       if _Eval(exp[1], env):
          return _ExecuteStatements(exp[2], env)
+      if len(exp) < 4:
+         return 0
       index = 3
       while exp[index] == 'elif':
          if _Eval(exp[index + 1], env):

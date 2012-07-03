@@ -1,0 +1,25 @@
+{
+   "sort": {
+      "params": ["l", "comp"],
+      "def": [
+         ["for", {"i": 0}, ["<", "i", ["len", "l"]], {"i": ["+", "i", 1]}, [
+            ["for", {"j": "i"}, ["<", "j", ["len", "l"]], {"j": ["+", "j", 1]}, [
+               ["if", ["comp", ["l", "i"], ["l", "j"]], [
+                  {"temp": ["l", "i"]},
+                  ["l", "i", ["l", "j"]],
+                  ["l", "j", "temp"]
+               ]]
+            ]]
+         ]],
+         "l"
+      ]
+   },
+   "main": {
+      "def": [
+         ["print", {"lit": "Unsorted:           "}, {"l": {"lit": [2, 23, 6, 1, 26, 923, 5, 0, 92]}}],
+         ["print", {"lit": "Sorted high to low: "}, ["sort", "l", "<"]],
+         ["print", {"lit": "Sorted low to high: "}, ["sort", "l", ">"]],
+         0
+      ]
+   }
+}
