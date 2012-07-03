@@ -67,6 +67,10 @@ def _Rand(args, env):
    args = EvalList(args, env)
    return random.randint(args[0], args[1])
 
+def _Cut(args, env):
+   args = EvalList(args, env)
+   return [args[0][:args[1]], args[0][args[1]:]]
+
 def ListChecker(args, env, f):
    l = EvalList(args, env)
    return all(f(l[i], l[i + 1]) for i in xrange(len(l) - 1))
@@ -93,7 +97,7 @@ OPS = {
    '+': _Add, '-': _Sub, '*': _Mult, '/': _Div,
    '<': _Lt, '>': _Gt, '<=': _LtE, '>=': _GtE, '=': _Eq, '!': _NEq,
    'print': _Print, 'assert': _Assert, 'len': _Len, 'ins': _Ins, 'del': _Del,
-   'rand': _Rand
+   'rand': _Rand, 'cut': _Cut
 }
 
 def _Error(message, code):
