@@ -19,6 +19,11 @@ import json
 import random
 import sys
 
+def penv(env):
+   for i in env:
+      print i,
+   print
+
 def _EvalList(l, env):
    return map(lambda x: _Eval(x, env), l)
 
@@ -129,8 +134,8 @@ def _IfBlock(exp, env):
             return _ExecuteStatements(exp[index + 2], env)
          index += 3
       return _ExecuteStatements(exp[-1], env)
-   except:
-      _Error('if', exp)
+   except Exception as e:
+      _Error('if', e)
 
 def _ForBlock(exp, env):
    try:
@@ -140,7 +145,7 @@ def _ForBlock(exp, env):
          _Eval(exp[3], env)
       return ret
    except Exception as e:
-      _Error('for', exp)
+      _Error('for', e)
 
 def _IsFunc(exp, env):
    try:
@@ -169,12 +174,13 @@ def _GetBasic(exp, env):
    return exp
 
 def _EvalFunc(f, args, env):
+   f_env = copy.copy(f[1])
    for (p, v) in zip(f[0]['params'], args):
       if type(v) in [str, unicode] and v in env:
-         f[1][p] = env[v]
+         f_env[p] = env[v]
       else:
-         f[1][p] = v
-   return _ExecuteStatements(f[0]['def'], f[1])
+         f_env[p] = v
+   return _ExecuteStatements(f[0]['def'], f_env)
 
 def _Eval(exp, env):
    # basic type
@@ -182,6 +188,8 @@ def _Eval(exp, env):
       return _GetBasic(exp, env)
    # function definition
    if type(exp) == dict and 'def' in exp:
+      print 'closed: ',
+      penv(env)
       return (exp, copy.copy(env))
    # variable
    if type(exp) in [str, unicode]:
@@ -232,7 +240,7 @@ def Eval(json_dict, env=None):
    for func in env:
       if type(env[func]) == tuple:
          env[func] = (env[func][0], env)
-   return _ExecuteStatements(json_dict['main']['def'], env)
+   return _ExecuteStatements(json_dict['main']['def'], copy.copy(env))
 
 def main():
    if len(sys.argv) < 2:

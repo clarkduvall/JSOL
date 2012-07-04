@@ -1,0 +1,31 @@
+{
+   "qsort": {
+      "params": ["l", "comp"],
+      "def": [
+         ["print", "l"],
+         ["if", [">", ["len", "l"], 1], [
+            {"pivot": ["l", 0]},
+            {"hi": {"lit": []}},
+            {"lo": {"lit": []}},
+            ["for", {"i": 0}, ["<", "i", ["len", "l"]], {"i": ["+", "i", 1]}, [
+               ["if", ["<", "pivot", ["l", "i"]], [
+                  ["ins", "hi", 0, ["l", "i"]]
+               ], "else", [
+                  ["ins", "lo", 0, ["l", "i"]]
+               ]]
+            ]],
+            ["+", ["qsort", "lo", "comp"], ["qsort", "hi", "comp"]]
+         ], "else", [
+            "l"
+         ]]
+      ]
+   },
+   "main": {
+      "def": [
+         {"l": {"lit": [2, 23, 6, 1, 26, 923, 5, 0, 92]}},
+         ["print", {"lit": "Sorted high to low: "}, ["qsort", "l", "<"]],
+         ["print", {"lit": "Sorted low to high: "}, ["qsort", "l", ">"]],
+         0
+      ]
+   }
+}
