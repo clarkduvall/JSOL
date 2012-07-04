@@ -1,0 +1,27 @@
+{
+   "add": {
+      "params": ["a", "b"],
+      "def": [
+         ["+", "a", "b"]
+      ]
+   },
+   "join": {
+      "params": ["a", "b"],
+      "def": [
+         ["+", "a", {"lit": " "}, "b"]
+      ]
+   },
+   "main": {
+      "params": [],
+      "def": [
+         ["print", {"lit": "Running fold_test..."}],
+         {"l1": {"lit": [1, 2, 3]}},
+         ["assert", 6, {"val": ["fold", "add", "l1"]}],
+         ["assert", {"lit": [1, 2, 3]}, "l1"],
+         {"l2": {"lit": [{"lit": "bob"}, {"lit": "is"}, {"lit": "cool"}]}},
+         ["assert", {"lit": "bob is cool"}, ["fold", "join", "l2"]],
+         ["assert", {"lit": [{"lit": "bob"}, {"lit": "is"}, {"lit": "cool"}]}, "l2"],
+         0
+      ]
+   }
+}

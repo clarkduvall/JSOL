@@ -1,0 +1,27 @@
+{
+   "add1": {
+      "params": ["a"],
+      "def": [
+         ["+", "a", 1]
+      ]
+   },
+   "addB": {
+      "params": ["a"],
+      "def": [
+         ["+", "a", {"lit": "B"}]
+      ]
+   },
+   "main": {
+      "params": [],
+      "def": [
+         ["print", {"lit": "Running map_test..."}],
+         {"l1": {"lit": [1, 2, 3]}},
+         {"l2": ["map", "add1", "l1"]},
+         ["assert", {"lit": [1, 2, 3]}, "l1"],
+         ["assert", {"lit": [2, 3, 4]}, "l2"],
+         {"l3": {"lit": [{"lit": "bob"}, {"lit": "is"}, {"lit": "here"}]}},
+         ["assert", {"lit": [{"lit": "bobB"}, {"lit": "isB"}, {"lit": "hereB"}]}, ["map", "addB", "l3"]],
+         0
+      ]
+   }
+}

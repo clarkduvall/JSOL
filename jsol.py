@@ -19,11 +19,11 @@ import json
 import random
 import sys
 
-def EvalList(l, env):
+def _EvalList(l, env):
    return map(lambda x: _Eval(x, env), l)
 
 def _Arithmetic(args, env, f):
-   args = EvalList(args, env)
+   args = _EvalList(args, env)
    return reduce(f, args)
 
 def _Add(args, env):
@@ -39,7 +39,7 @@ def _Div(args, env):
    return _Arithmetic(args, env, lambda x, y: x / y)
 
 def _Print(args, env):
-   args = EvalList(args, env)
+   args = _EvalList(args, env)
    for i in args:
       print i,
    print
@@ -50,29 +50,37 @@ def _Assert(args, env):
       print 'Assert failed: ', args
 
 def _Len(args, env):
-   args = EvalList(args, env)
+   args = _EvalList(args, env)
    lens = map(len, args)
    return sum(lens)
 
 def _Ins(args, env):
-   args = EvalList(args, env)
+   args = _EvalList(args, env)
    args[0].insert(args[1], args[2])
    return args[2]
 
 def _Del(args, env):
-   args = EvalList(args, env)
+   args = _EvalList(args, env)
    return args[0].pop(args[1])
 
 def _Rand(args, env):
-   args = EvalList(args, env)
+   args = _EvalList(args, env)
    return random.randint(args[0], args[1])
 
 def _Cut(args, env):
-   args = EvalList(args, env)
+   args = _EvalList(args, env)
    return [args[0][:args[1]], args[0][args[1]:]]
 
+def _Map(args, env):
+   args = _EvalList(args, env)
+   return map(lambda x: _EvalFunc(args[0], [x], env), args[1])
+
+def _Fold(args, env):
+   args = _EvalList(args, env)
+   return reduce(lambda x, y: _EvalFunc(args[0], [x, y], env), args[1])
+
 def ListChecker(args, env, f):
-   l = EvalList(args, env)
+   l = _EvalList(args, env)
    return all(f(l[i], l[i + 1]) for i in xrange(len(l) - 1))
 
 def _Lt(args, env):
@@ -97,12 +105,11 @@ OPS = {
    '+': _Add, '-': _Sub, '*': _Mult, '/': _Div,
    '<': _Lt, '>': _Gt, '<=': _LtE, '>=': _GtE, '=': _Eq, '!': _NEq,
    'print': _Print, 'assert': _Assert, 'len': _Len, 'ins': _Ins, 'del': _Del,
-   'rand': _Rand, 'cut': _Cut
+   'rand': _Rand, 'cut': _Cut, 'map': _Map, 'fold': _Fold
 }
 
 def _Error(message, code):
    print message + ': ', code
-   print
    exit(0)
 
 def _ExecuteStatements(statements, env):
@@ -161,6 +168,14 @@ def _GetBasic(exp, env):
       return lit
    return exp
 
+def _EvalFunc(f, args, env):
+   for (p, v) in zip(f[0]['params'], args):
+      if type(v) in [str, unicode] and v in env:
+         f[1][p] = env[v]
+      else:
+         f[1][p] = v
+   return _ExecuteStatements(f[0]['def'], f[1])
+
 def _Eval(exp, env):
    # basic type
    if _IsBasic(exp, env):
@@ -193,9 +208,8 @@ def _Eval(exp, env):
          return _ForBlock(exp, env)
       # evaluate function name
       f = _Eval(name, env)
-      # built in function
       if type(f) in [str, unicode] and f in OPS:
-         return OPS[f](exp[1:], env)
+         return OPS[f](args, env)
       if not _IsFunc(f, env):
          if len(args) == 2:
             val = _Eval(args[1], env)
@@ -206,9 +220,7 @@ def _Eval(exp, env):
             return _Eval(val, env)
          return val
       # function in environment
-      for (p, v) in zip(f[0]['params'], args):
-         f[1][p] = _Eval(v, f[1])
-      return _ExecuteStatements(f[0]['def'], f[1])
+      return _EvalFunc(f, args, env)
    # try to evaluate anything else
    else:
       return _Eval(exp, env)
