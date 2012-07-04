@@ -46,7 +46,7 @@ def _Print(args, env):
    return 0
 
 def _Assert(args, env):
-   if not _Eq(args[:], env):
+   if not _Eq(args, env):
       print 'Assert failed: ', args
 
 def _Len(args, env):
@@ -150,8 +150,7 @@ def _GetBasic(exp, env):
       lit = exp['lit']
       if type(lit) == list:
          for i in range(len(lit)):
-            if not _IsBasic(lit[i], env):
-               lit[i] = _Eval(lit[i], env)
+            lit[i] = _Eval(lit[i], env)
       if type(lit) == dict:
          new_env = copy.copy(env)
          _Eval(lit, new_env)
