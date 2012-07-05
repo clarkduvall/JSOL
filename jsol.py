@@ -119,7 +119,7 @@ LITERALS = {
 ###############################################################################
 
 def _Cond(f, l):
-   return Lit(all(f(l[i].val, l[i + 1].val) for i in xrange(len(l) - 1)), {})
+   return Lit(all(f(l[i].val, l[i + 1].val) for i in xrange(len(l) - 1)))
 
 def _Add(args):
    return reduce(lambda x, y: Lit(x.val + y.val), args)
@@ -206,6 +206,20 @@ def _EvalList(exp, env):
    if isinstance(exp[0], Function):
       return exp[0].Eval(exp[1:])
 
+def _IfBlock(exp, env):
+   if _Eval(exp[0], env).val:
+      return _Eval(exp[1], env)
+   if len(exp) > 2:
+      return _Eval(exp[2], env)
+   return Number(0, {})
+
+def _ForBlock(exp, env):
+   _Eval(exp[0], env)
+   while _Eval(exp[1], env).val:
+      ret = _ExecList(exp[3], env)
+      _Eval(exp[2], env)
+   return ret
+
 def _Eval(exp, env):
    if isinstance(exp, Type):
       return exp
@@ -224,6 +238,10 @@ def _Eval(exp, env):
          ret = env[k] = _Eval(v, new_env)
       return ret
    elif isinstance(exp, list):
+      if exp[0] == 'if':
+         return _IfBlock(exp[1:], env)
+      if exp[0] == 'for':
+         return _ForBlock(exp[1:], env)
       exp = map(lambda x: _Eval(x, env), exp)
       return _EvalList(exp, env)
    else:
