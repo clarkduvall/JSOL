@@ -19,228 +19,223 @@ import json
 import random
 import sys
 
-def penv(env):
-   for i in env:
-      print i,
-   print
+###############################################################################
+# Types                                                                       #
+###############################################################################
 
-def _EvalList(l, env):
-   return map(lambda x: _Eval(x, env), l)
+class Type(object): pass
 
-def _Arithmetic(args, env, f):
-   args = _EvalList(args, env)
-   return reduce(f, args)
+class Literal(Type):
+   def __init__(self, val, env):
+      self.val = val
 
-def _Add(args, env):
-   return _Arithmetic(args, env, lambda x, y: x + y)
+   def __str__(self):
+      return str(self.val)
 
-def _Sub(args, env):
-   return _Arithmetic(args, env, lambda x, y: x - y)
+   def __eq__(self, o):
+      return self.val == o.val
 
-def _Mult(args, env):
-   return _Arithmetic(args, env, lambda x, y: x * y)
+class List(Literal):
+   def __init__(self, val, env):
+      super(List, self).__init__(val, env)
+      for (i, v) in enumerate(self.val):
+         self.val[i] = _Eval(v, env)
 
-def _Div(args, env):
-   return _Arithmetic(args, env, lambda x, y: x / y)
+   def __str__(self):
+      return str(map(lambda x: x.__str__(), self.val))
 
-def _Print(args, env):
-   args = _EvalList(args, env)
-   for i in args:
-      print i,
-   print
-   return 0
+class Dict(Literal):
+   def __init__(self, val, env):
+      super(Dict, self).__init__(val, env)
+      if isinstance(env, Function):
+         dict_env = env.makeDict()
+      else:
+         dict_env = copy.copy(env)
+      for (k, v) in self.val.iteritems():
+         self.val[k] = _Eval(v, dict_env)
+      for v in self.val.values():
+         if isinstance(v, Function):
+            v._env = self.val
 
-def _Assert(args, env):
-   if not _Eq(args, env):
-      print 'Assert failed: ', args
+class String(Literal): pass
+class Number(Literal): pass
 
-def _Len(args, env):
-   args = _EvalList(args, env)
-   lens = map(len, args)
-   return sum(lens)
+class Function(Type):
+   def __init__(self, d, env):
+      if isinstance(env, Function):
+         self._env = env.makeDict()
+      else:
+         self._env = copy.copy(env)
+      self._params = d.get('params', [])
+      self._def = d.get('def', [])
+      self._run_env = {}
 
-def _Ins(args, env):
-   args = _EvalList(args, env)
-   args[0].insert(args[1], args[2])
-   return args[2]
+   def makeDict(self):
+      env = {}
+      env.update(self._env)
+      env.update(self._run_env)
+      return env
 
-def _Del(args, env):
-   args = _EvalList(args, env)
-   return args[0].pop(args[1])
+   def get(self, k, default=None):
+      if k in self._run_env:
+         return self._run_env[k]
+      if k in self._env:
+         return self._env[k]
+      return default
 
-def _Rand(args, env):
-   args = _EvalList(args, env)
-   return random.randint(args[0], args[1])
+   def __getitem__(self, k):
+      if k in self._run_env:
+         return self._run_env[k]
+      return self._env[k]
 
-def _Cut(args, env):
-   args = _EvalList(args, env)
-   return [args[0][:args[1]], args[0][args[1]:]]
+   def __setitem__(self, k, v):
+      if k in self._run_env or k not in self._env:
+         self._run_env[k] = v
+      else:
+         self._env[k] = v
 
-def _Map(args, env):
-   args = _EvalList(args, env)
-   return map(lambda x: _EvalFunc(args[0], [x], env), args[1])
+   def Eval(self, args):
+      self._run_env = dict(zip(self._params, args))
+      return _ExecList(self._def, self)
 
-def _Fold(args, env):
-   args = _EvalList(args, env)
-   return reduce(lambda x, y: _EvalFunc(args[0], [x, y], env), args[1])
+def Lit(val, env=None):
+   if env == None:
+      env = {}
+   if isinstance(val, Type):
+      return val
+   return LITERALS[type(val)](val, env)
 
-def ListChecker(args, env, f):
-   l = _EvalList(args, env)
-   return all(f(l[i], l[i + 1]) for i in xrange(len(l) - 1))
-
-def _Lt(args, env):
-   return ListChecker(args, env, lambda x, y: x < y)
-
-def _Gt(args, env):
-   return ListChecker(args, env, lambda x, y: x > y)
-
-def _LtE(args, env):
-   return ListChecker(args, env, lambda x, y: x <= y)
-
-def _GtE(args, env):
-   return ListChecker(args, env, lambda x, y: x >= y)
-
-def _Eq(args, env):
-   return ListChecker(args, env, lambda x, y: x == y)
-
-def _NEq(args, env):
-   return not _Eq(args, env)
-
-OPS = {
-   '+': _Add, '-': _Sub, '*': _Mult, '/': _Div,
-   '<': _Lt, '>': _Gt, '<=': _LtE, '>=': _GtE, '=': _Eq, '!': _NEq,
-   'print': _Print, 'assert': _Assert, 'len': _Len, 'ins': _Ins, 'del': _Del,
-   'rand': _Rand, 'cut': _Cut, 'map': _Map, 'fold': _Fold
+LITERALS = {
+   list: List,
+   dict: Dict,
+   str: String,
+   unicode: String,
+   int: Number,
+   bool: Number
 }
 
-def _Error(message, code):
-   print message + ': ', code
-   exit(0)
+###############################################################################
+# Built-in Functions                                                          #
+###############################################################################
 
-def _ExecuteStatements(statements, env):
-   for statement in statements[:-1]:
-      _Eval(statement, env)
-   return _Eval(statements[-1], env)
+def _Cond(f, l):
+   return Lit(all(f(l[i].val, l[i + 1].val) for i in xrange(len(l) - 1)), {})
 
-def _IfBlock(exp, env):
-   try:
-      if _Eval(exp[1], env):
-         return _ExecuteStatements(exp[2], env)
-      if len(exp) < 4:
-         return 0
-      index = 3
-      while exp[index] == 'elif':
-         if _Eval(exp[index + 1], env):
-            return _ExecuteStatements(exp[index + 2], env)
-         index += 3
-      return _ExecuteStatements(exp[-1], env)
-   except Exception as e:
-      _Error('if', e)
+def _Add(args):
+   return reduce(lambda x, y: Lit(x.val + y.val), args)
 
-def _ForBlock(exp, env):
-   try:
-      _Eval(exp[1], env)
-      while _Eval(exp[2], env):
-         ret = _ExecuteStatements(exp[-1], env)
-         _Eval(exp[3], env)
+def _Sub(args):
+   return reduce(lambda x, y: Lit(x.val - y.val), args)
+
+def _Mult(args):
+   return reduce(lambda x, y: Lit(x.val * y.val), args)
+
+def _Div(args):
+   return reduce(lambda x, y: Lit(x.val / y.val), args)
+
+def _Print(args):
+   for arg in args:
+      print arg,
+   print
+
+def _Eq(args):
+   return _Cond(lambda x, y: x == y, args)
+
+def _NEq(args):
+   return Lit(not _Eq(args).val)
+
+def _Lt(args):
+   return _Cond(lambda x, y: x < y, args)
+
+def _Gt(args):
+   return _Cond(lambda x, y: x > y, args)
+
+def _LtE(args):
+   return _Cond(lambda x, y: x <= y, args)
+
+def _GtE(args):
+   return _Cond(lambda x, y: x >= y, args)
+
+def _Len(args):
+   return Lit(sum(map(lambda x: len(x.val), args)))
+
+def _Ins(args):
+   args[0].val.insert(args[1].val, args[2])
+   return args[2]
+
+def _Del(args):
+   return args[0].val.pop(args[1].val)
+
+def _Cut(args):
+   return Lit([Lit(args[0].val[:args[1].val]), Lit(args[0].val[args[1].val:])])
+
+def _Map(args):
+   return Lit(map(lambda x: args[0].Eval([x]), args[1].val))
+
+def _Fold(args):
+   return Lit(reduce(lambda x, y: args[0].Eval([x, y]), args[1].val))
+
+def _Assert(args):
+   if not _Eq(args).val:
+      print 'Assert failed:', args[0], args[1]
+
+OPS = {
+      '+': _Add, '-': _Sub, '*': _Mult, '/': _Div, 'print': _Print,
+      '=': _Eq, '!': _NEq, '<': _Lt, '>': _Gt, '<=': _LtE, '>=': _GtE,
+      'len': _Len, 'ins': _Ins, 'del': _Del, 'cut': _Cut, 'map': _Map,
+      'fold': _Fold, 'assert': _Assert
+}
+
+###############################################################################
+# Interpreter                                                                 #
+###############################################################################
+
+def _ExecList(l, env):
+   for exp in l[:-1]:
+      _Eval(exp, env)
+   return _Eval(l[-1], env)
+
+def _EvalList(exp, env):
+   if exp[0] in OPS:
+      return OPS[exp[0]](exp[1:])
+   if isinstance(exp[0], (Dict, List, String)):
+      if len(exp) == 2:
+         return Lit(exp[0].val[exp[1].val])
+      ret = exp[0].val[exp[1].val] = exp[2]
       return ret
-   except Exception as e:
-      _Error('for', e)
-
-def _IsFunc(exp, env):
-   try:
-      return type(exp) == tuple or (type(exp) in [str, unicode] and exp in OPS)
-   except:
-      return False
-
-def _IsBasic(exp, env):
-   return _IsFunc(exp, env) or (type(exp) in [int, long, float, bool]) or (
-       type(exp) == dict and 'lit' in exp)
-
-def _GetBasic(exp, env):
-   if type(exp) == dict and 'lit' in exp:
-      lit = exp['lit']
-      if type(lit) == list:
-         for i in range(len(lit)):
-            lit[i] = _Eval(lit[i], env)
-      if type(lit) == dict:
-         new_env = copy.copy(env)
-         _Eval(lit, new_env)
-         for func in new_env:
-            if type(new_env[func]) == tuple:
-               new_env[func] = (new_env[func][0], new_env)
-         return new_env
-      return lit
-   return exp
-
-def _EvalFunc(f, args, env):
-   f_env = copy.copy(f[1])
-   for (p, v) in zip(f[0]['params'], args):
-      if type(v) in [str, unicode] and v in env:
-         f_env[p] = env[v]
-      else:
-         f_env[p] = v
-   return _ExecuteStatements(f[0]['def'], f_env)
+   if isinstance(exp[0], Function):
+      return exp[0].Eval(exp[1:])
 
 def _Eval(exp, env):
-   # basic type
-   if _IsBasic(exp, env):
-      return _GetBasic(exp, env)
-   # function definition
-   if type(exp) == dict and 'def' in exp:
-      print 'closed: ',
-      penv(env)
-      return (exp, copy.copy(env))
-   # variable
-   if type(exp) in [str, unicode]:
-      if exp in OPS:
-         _Error('%s is a keyword' % exp, env)
-      if exp not in env:
-         _Error('Variable %s not bound' % exp, env)
-      return env[exp]
-   # string literal or assignment
-   elif type(exp) == dict:
-      ret = 0
-      for var in exp:
-         ret = env[var] = _Eval(exp[var], env)
+   if isinstance(exp, Type):
+      return exp
+   if isinstance(exp, (str, unicode)) and exp in OPS:
+      return exp
+   if isinstance(exp, (float, int, bool)):
+      return Number(exp, env)
+   elif isinstance(exp, dict):
+      if 'lit' in exp:
+         return Lit(exp['lit'], env)
+      if 'def' in exp:
+         return Function(exp, env)
+      new_env = copy.copy(env)
+      # TODO make sure not empty
+      for (k, v) in exp.iteritems():
+         ret = env[k] = _Eval(v, new_env)
       return ret
-   # function call/if/for
-   elif type(exp) == list:
-      name = exp[0]
-      args = exp[1:]
-      # if statement
-      if name == 'if':
-         return _IfBlock(exp, env)
-      # for loop
-      if name == 'for':
-         return _ForBlock(exp, env)
-      # evaluate function name
-      f = _Eval(name, env)
-      if type(f) in [str, unicode] and f in OPS:
-         return OPS[f](args, env)
-      if not _IsFunc(f, env):
-         if len(args) == 2:
-            val = _Eval(args[1], env)
-            f[_Eval(args[0], env)] = val
-            return val
-         val = f[_Eval(args[0], env)]
-         if _IsBasic(val, env):
-            return _Eval(val, env)
-         return val
-      # function in environment
-      return _EvalFunc(f, args, env)
-   # try to evaluate anything else
+   elif isinstance(exp, list):
+      exp = map(lambda x: _Eval(x, env), exp)
+      return _EvalList(exp, env)
    else:
-      return _Eval(exp, env)
+      return env[exp]
 
-def Eval(json_dict, env=None):
-   if not env:
-      env = {}
+def Eval(json_dict):
+   env = {}
    _Eval(json_dict, env)
-   for func in env:
-      if type(env[func]) == tuple:
-         env[func] = (env[func][0], env)
-   return _ExecuteStatements(json_dict['main']['def'], copy.copy(env))
+   for v in env.values():
+      if isinstance(v, Function):
+         v._env = env
+   return env['main'].Eval([]).val
 
 def main():
    if len(sys.argv) < 2:
