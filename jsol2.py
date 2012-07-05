@@ -32,6 +32,9 @@ class Literal(Type):
    def __str__(self):
       return str(self.val)
 
+   def __eq__(self, o):
+      return self.val == o.val
+
 class List(Literal):
    def __init__(self, val, env):
       super(List, self).__init__(val, env)
@@ -85,7 +88,11 @@ class Function(Type):
       self._run_env = dict(zip(self._params, args))
       return _ExecList(self._def, self)
 
-def Lit(val, env):
+def Lit(val, env=None):
+   if env == None:
+      env = {}
+   if isinstance(val, Type):
+      return val
    return LITERALS[type(val)](val, env)
 
 LITERALS = {
@@ -102,20 +109,19 @@ LITERALS = {
 ###############################################################################
 
 def _Cond(f, l):
-   print l
    return Lit(all(f(l[i].val, l[i + 1].val) for i in xrange(len(l) - 1)), {})
 
 def _Add(args):
-   return reduce(lambda x, y: Lit(x.val + y.val, {}), args)
+   return reduce(lambda x, y: Lit(x.val + y.val), args)
 
 def _Sub(args):
-   return reduce(lambda x, y: Lit(x.val - y.val, {}), args)
+   return reduce(lambda x, y: Lit(x.val - y.val), args)
 
 def _Mult(args):
-   return reduce(lambda x, y: Lit(x.val * y.val, {}), args)
+   return reduce(lambda x, y: Lit(x.val * y.val), args)
 
 def _Div(args):
-   return reduce(lambda x, y: Lit(x.val / y.val, {}), args)
+   return reduce(lambda x, y: Lit(x.val / y.val), args)
 
 def _Print(args):
    for arg in args:
@@ -126,7 +132,7 @@ def _Eq(args):
    return _Cond(lambda x, y: x == y, args)
 
 def _NEq(args):
-   return _Eval({'lit': not _Eq(args).val}, {})
+   return Lit(not _Eq(args).val)
 
 def _Lt(args):
    return _Cond(lambda x, y: x < y, args)
@@ -140,6 +146,25 @@ def _LtE(args):
 def _GtE(args):
    return _Cond(lambda x, y: x >= y, args)
 
+def _Len(args):
+   return Lit(sum(map(lambda x: len(x.val), args)))
+
+def _Ins(args):
+   args[0].val.insert(args[1].val, args[2])
+   return args[2]
+
+def _Del(args):
+   return args[0].val.pop(args[1].val)
+
+def _Cut(args):
+   return Lit([Lit(args[0].val[:args[1].val]), Lit(args[0].val[args[1].val:])])
+
+def _Map(args):
+   return Lit(map(lambda x: args[0].Eval([x]), args[1].val))
+
+def _Fold(args):
+   return Lit(reduce(lambda x, y: args[0].Eval([x, y]), args[1].val))
+
 def _Assert(args):
    if not _Eq(args).val:
       print 'Assert failed:', args[0], args[1]
@@ -147,7 +172,8 @@ def _Assert(args):
 OPS = {
       '+': _Add, '-': _Sub, '*': _Mult, '/': _Div, 'print': _Print,
       '=': _Eq, '!': _NEq, '<': _Lt, '>': _Gt, '<=': _LtE, '>=': _GtE,
-      'assert': _Assert
+      'len': _Len, 'ins': _Ins, 'del': _Del, 'cut': _Cut, 'map': _Map,
+      'fold': _Fold, 'assert': _Assert
 }
 
 ###############################################################################
@@ -159,12 +185,12 @@ def _ExecList(l, env):
       _Eval(exp, env)
    return _Eval(l[-1], env)
 
-def _EvalList(exp):
+def _EvalList(exp, env):
    if exp[0] in OPS:
       return OPS[exp[0]](exp[1:])
-   if isinstance(exp[0], (Dict, List)):
+   if isinstance(exp[0], (Dict, List, String)):
       if len(exp) == 2:
-         return exp[0].val[exp[1].val]
+         return Lit(exp[0].val[exp[1].val])
       ret = exp[0].val[exp[1].val] = exp[2]
       return ret
    if isinstance(exp[0], Function):
@@ -189,7 +215,7 @@ def _Eval(exp, env):
       return ret
    elif isinstance(exp, list):
       exp = map(lambda x: _Eval(x, env), exp)
-      return _EvalList(exp)
+      return _EvalList(exp, env)
    else:
       return env[exp]
 
