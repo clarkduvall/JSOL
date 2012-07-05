@@ -2,11 +2,12 @@
    "qsort": {
       "params": ["l", "comp"],
       "def": [
-         ["print", "l"],
          ["if", [">", ["len", "l"], 1], [
             {"pivot": ["l", 0]},
+            ["print", {"lit": "Right before"}],
             {"hi": {"lit": []}},
             {"lo": {"lit": []}},
+            ["print", "hi"],
             ["for", {"i": 0}, ["<", "i", ["len", "l"]], {"i": ["+", "i", 1]}, [
                ["if", ["<", "pivot", ["l", "i"]], [
                   ["ins", "hi", 0, ["l", "i"]]
@@ -15,7 +16,7 @@
                ]]
             ]],
             ["+", ["qsort", "lo", "comp"], ["qsort", "hi", "comp"]]
-         ], [ "l" ]]
+         ],  ["l"] ]
       ]
    },
    "main": {

@@ -27,7 +27,7 @@ class Type(object): pass
 
 class Literal(Type):
    def __init__(self, val, env):
-      self.val = val
+      self.val = copy.copy(val)
 
    def __str__(self):
       return str(self.val)
@@ -77,16 +77,10 @@ class Function(Type):
       return env
 
    def get(self, k, default=None):
-      if k in self._run_env:
-         return self._run_env[k]
-      if k in self._env:
-         return self._env[k]
-      return default
+      return self.makeDict().get(k, default)
 
    def __getitem__(self, k):
-      if k in self._run_env:
-         return self._run_env[k]
-      return self._env[k]
+      return self.makeDict()[k]
 
    def __setitem__(self, k, v):
       if k in self._run_env or k not in self._env:
@@ -208,9 +202,9 @@ def _EvalList(exp, env):
 
 def _IfBlock(exp, env):
    if _Eval(exp[0], env).val:
-      return _Eval(exp[1], env)
+      return _ExecList(exp[1], env)
    if len(exp) > 2:
-      return _Eval(exp[2], env)
+      return _ExecList(exp[2], env)
    return Number(0, {})
 
 def _ForBlock(exp, env):
@@ -235,7 +229,12 @@ def _Eval(exp, env):
       new_env = copy.copy(env)
       # TODO make sure not empty
       for (k, v) in exp.iteritems():
+         print k
          ret = env[k] = _Eval(v, new_env)
+      if isinstance(env, Function):
+         print 'fEnv:', env.makeDict()
+      else:
+         print 'Env:', env
       return ret
    elif isinstance(exp, list):
       if exp[0] == 'if':
