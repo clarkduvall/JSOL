@@ -4,24 +4,23 @@
       "def": [
          ["if", [">", ["len", "l"], 1], [
             {"pivot": ["l", 0]},
-            ["print", {"lit": "Right before"}],
             {"hi": {"lit": []}},
             {"lo": {"lit": []}},
-            ["print", "hi"],
             ["for", {"i": 0}, ["<", "i", ["len", "l"]], {"i": ["+", "i", 1]}, [
-               ["if", ["<", "pivot", ["l", "i"]], [
+               ["if", ["comp", ["l", "i"], "pivot"], [
                   ["ins", "hi", 0, ["l", "i"]]
                ], [
                   ["ins", "lo", 0, ["l", "i"]]
                ]]
             ]],
-            ["+", ["qsort", "lo", "comp"], ["qsort", "hi", "comp"]]
-         ],  ["l"] ]
+            {"r": ["+", ["qsort", "lo", "comp"], ["qsort", "hi", "comp"]]}
+         ], [{"r": "l"}] ],
+         "r"
       ]
    },
    "main": {
       "def": [
-         {"l": {"lit": [2, 23, 6, 1, 26, 923, 5, 0, 92]}},
+         ["print", {"lit": "Unsorted:           "}, {"l": {"lit": [2, 23, 6, 1, 26, 923, 5, 0, 92]}}],
          ["print", {"lit": "Sorted high to low: "}, ["qsort", "l", "<"]],
          ["print", {"lit": "Sorted low to high: "}, ["qsort", "l", ">"]],
          0

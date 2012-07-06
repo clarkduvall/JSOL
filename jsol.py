@@ -202,7 +202,8 @@ def _EvalList(exp, env):
 
 def _IfBlock(exp, env):
    if _Eval(exp[0], env).val:
-      return _ExecList(exp[1], env)
+      r = _ExecList(exp[1], env)
+      return r
    if len(exp) > 2:
       return _ExecList(exp[2], env)
    return Number(0, {})
@@ -229,12 +230,7 @@ def _Eval(exp, env):
       new_env = copy.copy(env)
       # TODO make sure not empty
       for (k, v) in exp.iteritems():
-         print k
          ret = env[k] = _Eval(v, new_env)
-      if isinstance(env, Function):
-         print 'fEnv:', env.makeDict()
-      else:
-         print 'Env:', env
       return ret
    elif isinstance(exp, list):
       if exp[0] == 'if':
