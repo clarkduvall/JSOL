@@ -1,26 +1,21 @@
 {
    "qsort": {
-      "params": ["l", "comp"],
+      "params": ["l", "c"],
       "def": [
          ["if", [">", ["len", "l"], 1], [
-            {"pivot": ["l", 0]},
-            {"hi": {"lit": []}, "lo": {"lit": []}},
-            ["for", {"i": 0}, ["<", "i", ["len", "l"]], {"i": ["+", "i", 1]}, [
-               ["if", ["comp", ["l", "i"], "pivot"], [
-                  ["ins", "hi", 0, ["l", "i"]]
-               ], [
-                  ["ins", "lo", 0, ["l", "i"]]
-               ]]
-            ]],
-            ["+", ["qsort", "lo", "comp"], ["qsort", "hi", ">"]]
-         ], ["l"] ]
+            {"p": ["l", 0]},
+            {"lo": ["qsort", ["filter", {"params": ["x"], "def": [["c", "p", "x"]]}, "l"], "c"]},
+            {"hi": ["qsort", ["filter", {"params": ["x"], "def": [["c", "x", "p"]]}, "l"], "c"]},
+            ["ins", "lo", ["len", "lo"], "p"],
+            ["+", "lo", "hi"]
+         ], ["l"]]
       ]
    },
    "main": {
       "def": [
-         ["print", {"lit": "Unsorted:           "}, {"l": {"lit": [2, 23, 6, 1, 26, 923, 5, 0, 92]}}],
-         ["print", {"lit": "Sorted high to low: "}, ["qsort", "l", "<"]],
-         ["print", {"lit": "Sorted low to high: "}, ["qsort", "l", ">"]],
+         ["print", {"lit": "Unsorted:          "}, {"l": {"lit": [2, 23, 6, 1, 26, 923, 5, 0, 92]}}],
+         ["print", {"lit": "Sorted high to low:"}, ["qsort", "l", "<"]],
+         ["print", {"lit": "Sorted low to high:"}, ["qsort", "l", ">"]],
          0
       ]
    }

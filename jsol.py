@@ -177,11 +177,14 @@ def _Assert(args):
    if not _Eq(args).val:
       print 'Assert failed:', args[0], args[1]
 
+def _Round(args):
+   return Lit(int(round(args[0].val)))
+
 OPS = {
       '+': _Add, '-': _Sub, '*': _Mult, '/': _Div, 'print': _Print,
       '=': _Eq, '!': _NEq, '<': _Lt, '>': _Gt, '<=': _LtE, '>=': _GtE,
       'len': _Len, 'ins': _Ins, 'del': _Del, 'cut': _Cut, 'map': _Map,
-      'fold': _Fold, 'filter': _Filter, 'assert': _Assert
+      'fold': _Fold, 'filter': _Filter, 'assert': _Assert, 'round': _Round
 }
 
 ###############################################################################
@@ -211,13 +214,6 @@ def _IfBlock(exp, env):
       return _ExecList(exp[2], env)
    return Number(0, {})
 
-def _ForBlock(exp, env):
-   _Eval(exp[0], env)
-   while _Eval(exp[1], env).val:
-      ret = _ExecList(exp[3], env)
-      _Eval(exp[2], env)
-   return ret
-
 def _Eval(exp, env):
    if isinstance(exp, Type):
       return exp
@@ -238,8 +234,6 @@ def _Eval(exp, env):
    elif isinstance(exp, list):
       if exp[0] == 'if':
          return _IfBlock(exp[1:], env)
-      if exp[0] == 'for':
-         return _ForBlock(exp[1:], env)
       exp = map(lambda x: _Eval(x, env), exp)
       return _EvalList(exp, env)
    else:
