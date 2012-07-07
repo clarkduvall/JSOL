@@ -16,7 +16,6 @@
 
 import copy
 import json
-import random
 import sys
 
 ###############################################################################
@@ -89,6 +88,7 @@ class Function(Type):
          self._env[k] = v
 
    def Eval(self, args):
+      self = copy.copy(self)
       self._run_env = dict(zip(self._params, args))
       return _ExecList(self._def, self)
 
@@ -105,7 +105,8 @@ LITERALS = {
    str: String,
    unicode: String,
    int: Number,
-   bool: Number
+   bool: Number,
+   float: Number,
 }
 
 ###############################################################################
@@ -169,6 +170,9 @@ def _Map(args):
 def _Fold(args):
    return Lit(reduce(lambda x, y: args[0].Eval([x, y]), args[1].val))
 
+def _Filter(args):
+   return Lit(filter(lambda x: args[0].Eval([x]).val, args[1].val))
+
 def _Assert(args):
    if not _Eq(args).val:
       print 'Assert failed:', args[0], args[1]
@@ -177,7 +181,7 @@ OPS = {
       '+': _Add, '-': _Sub, '*': _Mult, '/': _Div, 'print': _Print,
       '=': _Eq, '!': _NEq, '<': _Lt, '>': _Gt, '<=': _LtE, '>=': _GtE,
       'len': _Len, 'ins': _Ins, 'del': _Del, 'cut': _Cut, 'map': _Map,
-      'fold': _Fold, 'assert': _Assert
+      'fold': _Fold, 'filter': _Filter, 'assert': _Assert
 }
 
 ###############################################################################
@@ -202,8 +206,7 @@ def _EvalList(exp, env):
 
 def _IfBlock(exp, env):
    if _Eval(exp[0], env).val:
-      r = _ExecList(exp[1], env)
-      return r
+      return _ExecList(exp[1], env)
    if len(exp) > 2:
       return _ExecList(exp[2], env)
    return Number(0, {})

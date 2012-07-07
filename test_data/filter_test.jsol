@@ -1,0 +1,27 @@
+{
+   "positive": {
+      "params": ["a"],
+      "def": [
+         [">", "a", 0]
+      ]
+   },
+   "negative": {
+      "params": ["a"],
+      "def": [
+         ["<", "a", 0]
+      ]
+   },
+   "main": {
+      "params": [],
+      "def": [
+         ["print", {"lit": "Running filter_test..."}],
+         {"l": {"lit": [9, -2, 1, 2, -4, 3]}},
+         {"p": ["filter", "positive", "l"]},
+         {"n": ["filter", "negative", "l"]},
+         ["assert", {"lit": [9, -2, 1, 2, -4, 3]}, "l"],
+         ["assert", {"lit": [9, 1, 2, 3]}, "p"],
+         ["assert", {"lit": [-2, -4]}, "n"],
+         0
+      ]
+   }
+}
