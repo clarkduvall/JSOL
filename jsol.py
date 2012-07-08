@@ -17,6 +17,7 @@
 import copy
 import json
 import sys
+import types
 
 ###############################################################################
 # Types                                                                       #
@@ -58,6 +59,7 @@ class Dict(Literal):
 
 class String(Literal): pass
 class Number(Literal): pass
+class Null(Literal): pass
 
 class Function(Type):
    def __init__(self, d, env):
@@ -107,6 +109,7 @@ LITERALS = {
    int: Number,
    bool: Number,
    float: Number,
+   types.NoneType: Null,
 }
 
 ###############################################################################
@@ -192,6 +195,8 @@ OPS = {
 ###############################################################################
 
 def _ExecList(l, env):
+   if len(l) == 0:
+      return Lit(None)
    for exp in l[:-1]:
       _Eval(exp, env)
    return _Eval(l[-1], env)
@@ -208,26 +213,27 @@ def _EvalList(exp, env):
       return exp[0].Eval(exp[1:])
 
 def _IfBlock(exp, env):
-   if _Eval(exp[0], env).val:
-      return _ExecList(exp[1], env)
-   if len(exp) > 2:
-      return _ExecList(exp[2], env)
-   return Number(0, {})
+   for i in range(0, len(exp) - 1, 2):
+      if _Eval(exp[i], env).val:
+         return _ExecList(exp[i + 1], env)
+   if len(exp) % 2:
+      return _ExecList(exp[-1], env)
+   return Lit(None)
 
 def _Eval(exp, env):
    if isinstance(exp, Type):
       return exp
    if isinstance(exp, (str, unicode)) and exp in OPS:
       return exp
-   if isinstance(exp, (float, int, bool)):
-      return Number(exp, env)
+   if isinstance(exp, (float, int, bool, types.NoneType)):
+      return Lit(exp, env)
    elif isinstance(exp, dict):
       if 'lit' in exp:
          return Lit(exp['lit'], env)
       if 'def' in exp:
          return Function(exp, env)
       new_env = copy.copy(env)
-      # TODO make sure not empty
+      ret = Lit(None)
       for (k, v) in exp.iteritems():
          ret = env[k] = _Eval(v, new_env)
       return ret
