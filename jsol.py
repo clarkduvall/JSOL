@@ -231,15 +231,15 @@ def _Eval(exp, env):
          return Lit(exp['lit'], env)
       if 'def' in exp:
          return Function(exp, env)
-      new_env = _CopyEnv(env)
+      new_env = copy.copy(env)
       ret = Lit(None)
       for (k, v) in exp.iteritems():
          ret = env[k] = _Eval(v, new_env)
-      new_env = _CopyEnv(env)
-      # Test same env
       for k in exp:
-         if isinstance(new_env[k], Function):
-            new_env[k]._env = copy.copy(new_env)
+         if isinstance(env[k], Function):
+            temp_env = _CopyEnv(env)
+            temp_env.update(env[k]._env)
+            env[k]._env = temp_env
       return ret
    elif isinstance(exp, list):
       if exp[0] == 'if':
