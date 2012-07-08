@@ -47,10 +47,7 @@ class List(Literal):
 class Dict(Literal):
    def __init__(self, val, env):
       super(Dict, self).__init__(val, env)
-      if isinstance(env, Function):
-         dict_env = env.makeDict()
-      else:
-         dict_env = copy.copy(env)
+      dict_env = _CopyEnv(env)
       for (k, v) in self.val.iteritems():
          self.val[k] = _Eval(v, dict_env)
       for v in self.val.values():
@@ -63,10 +60,7 @@ class Null(Literal): pass
 
 class Function(Type):
    def __init__(self, d, env):
-      if isinstance(env, Function):
-         self._env = env.makeDict()
-      else:
-         self._env = copy.copy(env)
+      self._env = _CopyEnv(env)
       self._params = d.get('params', [])
       self._def = d.get('def', [])
       self._run_env = {}
@@ -194,6 +188,11 @@ OPS = {
 # Interpreter                                                                 #
 ###############################################################################
 
+def _CopyEnv(env):
+   if isinstance(env, Function):
+      return env.makeDict()
+   return copy.copy(env)
+
 def _ExecList(l, env):
    if len(l) == 0:
       return Lit(None)
@@ -232,10 +231,15 @@ def _Eval(exp, env):
          return Lit(exp['lit'], env)
       if 'def' in exp:
          return Function(exp, env)
-      new_env = copy.copy(env)
+      new_env = _CopyEnv(env)
       ret = Lit(None)
       for (k, v) in exp.iteritems():
          ret = env[k] = _Eval(v, new_env)
+      new_env = _CopyEnv(env)
+      # Test same env
+      for k in exp:
+         if isinstance(new_env[k], Function):
+            new_env[k]._env = copy.copy(new_env)
       return ret
    elif isinstance(exp, list):
       if exp[0] == 'if':

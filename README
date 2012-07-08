@@ -11,7 +11,7 @@ Features
 
  - Closures
  - First class functions
- - string, list, number, dictionary, and function types
+ - string, list, number, dictionary, null, and function types
  - fully representable in JSON.
 
 
@@ -35,12 +35,11 @@ Syntax
     - '["d", {"lit": "a"}]'          -> get the value with the key "a"
     - '["d", {"lit": "a"}, 5]'       -> set "a" to be 5 in the dictionary
 
-   For/If blocks
-    - '["for", <exp>, <cond>, <exp>, |
-          [...]                      |
-       ]'                            -> for loop
+   If block
     - '["if",                        |
           <cond>, [...],             |
+          <cond>, [...],             |
+          ...                        |
           [...]                      |
        ]'                            -> if/else
 
@@ -53,7 +52,7 @@ Run examples by typing 'jsol.py examples/<name_of_example>'
    - fib.jsol - outputs the Fibonacci sequence using a closure
    - magic.jsol - a magic 8 ball that ouputs three answers at random
    - recursive.jsol - an example of a recursive function
-   - sort.jsol - an example of sorting a list by passing in a compare function
+   - quick_sort.jsol - an example of sorting a list by passing in a compare function
 
 
 Testing
