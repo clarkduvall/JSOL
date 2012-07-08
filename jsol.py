@@ -35,6 +35,9 @@ class Literal(Type):
    def __eq__(self, o):
       return self.val == o.val
 
+   def json(self):
+      return dict([('lit', self.val)])
+
 class List(Literal):
    def __init__(self, val, env):
       super(List, self).__init__(val, env)
@@ -43,6 +46,9 @@ class List(Literal):
 
    def __str__(self):
       return str(map(lambda x: x.__str__(), self.val))
+
+   def json(self):
+      return dict([('lit', map(lambda x: x.json(), self.val))])
 
 class Dict(Literal):
    def __init__(self, val, env):
@@ -54,9 +60,19 @@ class Dict(Literal):
          if isinstance(v, Function):
             v._env = self.val
 
+   def json(self):
+      return dict([('lit',
+                    dict(zip(self.val.keys(),
+                             map(lambda x: x.json(), self.val.values()))))])
+
 class String(Literal): pass
-class Number(Literal): pass
-class Null(Literal): pass
+class Number(Literal):
+   def json(self):
+      return self.val
+
+class Null(Literal):
+   def json(self):
+      return self.val
 
 class Function(Type):
    def __init__(self, d, env):
@@ -70,6 +86,9 @@ class Function(Type):
       env.update(self._env)
       env.update(self._run_env)
       return env
+
+   def json(self):
+      return dict([('params', self._params), ('def', self._def)])
 
    def get(self, k, default=None):
       return self.makeDict().get(k, default)
@@ -255,7 +274,7 @@ def Eval(json_dict):
    for v in env.values():
       if isinstance(v, Function):
          v._env = env
-   return env['main'].Eval([]).val
+   return env['main'].Eval([])
 
 def main():
    if len(sys.argv) < 2:

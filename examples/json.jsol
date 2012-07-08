@@ -1,0 +1,19 @@
+{
+   "main": {
+      "def": [
+         {"a": 5},
+         {"d": {"lit": {
+            "list": {"lit": [1, 23, {"lit": "string"}]},
+            "f": {
+               "def": [
+                  ["+", 2, 3]
+               ]
+            },
+            "string": {"lit": "string"},
+            "five": "a",
+            "main": "main"
+         }}},
+         "d"
+      ]
+   }
+}
