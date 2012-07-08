@@ -50,7 +50,6 @@ The examples/ directory has some example programs.
 Run examples by typing 'jsol.py examples/<name_of_example>'
 
    - fib.jsol - outputs the Fibonacci sequence using a closure
-   - magic.jsol - a magic 8 ball that ouputs three answers at random
    - recursive.jsol - an example of a recursive function
    - quick_sort.jsol - an example of sorting a list by passing in a compare function
 

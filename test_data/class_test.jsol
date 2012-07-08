@@ -1,0 +1,26 @@
+{
+   "classA": {
+      "def": [
+         {"lit": {
+            "a": 5,
+            "add": {
+               "params": ["x"],
+               "def": [
+                  ["+", "a", "x"]
+               ]
+            }
+         }}
+      ]
+   },
+   "main": {
+      "def": [
+         ["print", {"lit": "Running class_test..."}],
+         {"A": ["classA"]},
+         ["assert", 5, ["A", {"lit": "a"}]],
+         ["assert", 10, [["A", {"lit": "add"}], 5]],
+         ["A", {"lit": "a"}, 10],
+         ["assert", 15, [["A", {"lit": "add"}], 5]],
+         0
+      ]
+   }
+}
