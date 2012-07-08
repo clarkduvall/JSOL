@@ -14,6 +14,12 @@
          ["assert", 0, ["<=", 1, 1, 0]],
          ["assert", 0, ["<=", 4, 1, 1]],
          ["assert", 1, ["<=", 0, 1, 2]],
+         ["assert", {"lit": "String"}, ["type", {"lit": "bob"}]],
+         ["assert", {"lit": "Number"}, ["type", 2]],
+         ["assert", {"lit": "List"}, ["type", {"lit": [1, 2, 3]}]],
+         ["assert", {"lit": "Dict"}, ["type", {"lit": {"a": 5}}]],
+         ["assert", {"lit": "Function"}, ["type", {"def": []}]],
+         ["assert", {"lit": "Null"}, ["type", null]],
          0
       ]
    }

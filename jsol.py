@@ -114,6 +114,15 @@ def Lit(val, env=None):
       return val
    return LITERALS[type(val)](val, env)
 
+TYPES = {
+   List: "List",
+   Dict: "Dict",
+   String: "String",
+   Number: "Number",
+   Function: "Function",
+   Null: "Null"
+}
+
 LITERALS = {
    list: List,
    dict: Dict,
@@ -196,11 +205,15 @@ def _Assert(args):
 def _Round(args):
    return Lit(int(round(args[0].val)))
 
+def _Type(args):
+   return Lit(TYPES[type(args[0])])
+
 OPS = {
       '+': _Add, '-': _Sub, '*': _Mult, '/': _Div, 'print': _Print,
       '=': _Eq, '!': _NEq, '<': _Lt, '>': _Gt, '<=': _LtE, '>=': _GtE,
       'len': _Len, 'ins': _Ins, 'del': _Del, 'cut': _Cut, 'map': _Map,
-      'fold': _Fold, 'filter': _Filter, 'assert': _Assert, 'round': _Round
+      'fold': _Fold, 'filter': _Filter, 'assert': _Assert, 'round': _Round,
+      'type': _Type
 }
 
 ###############################################################################
@@ -245,7 +258,7 @@ def _Eval(exp, env):
       return exp
    if isinstance(exp, (float, int, bool, types.NoneType)):
       return Lit(exp, env)
-   elif isinstance(exp, dict):
+   if isinstance(exp, dict):
       if 'lit' in exp:
          return Lit(exp['lit'], env)
       if 'def' in exp:
@@ -260,20 +273,16 @@ def _Eval(exp, env):
             temp_env.update(env[k]._env)
             env[k]._env = temp_env
       return ret
-   elif isinstance(exp, list):
+   if isinstance(exp, list):
       if exp[0] == 'if':
          return _IfBlock(exp[1:], env)
       exp = map(lambda x: _Eval(x, env), exp)
       return _EvalList(exp, env)
-   else:
-      return env[exp]
+   return env[exp]
 
 def Eval(json_dict):
    env = {}
    _Eval(json_dict, env)
-   for v in env.values():
-      if isinstance(v, Function):
-         v._env = env
    return env['main'].Eval([])
 
 def main():
