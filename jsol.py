@@ -74,6 +74,9 @@ class Null(Literal):
    def json(self):
       return self.val
 
+   def __str__(self):
+      return 'Null'
+
 class Function(Type):
    def __init__(self, d, env):
       self._env = _CopyEnv(env)
@@ -129,6 +132,7 @@ LITERALS = {
    str: String,
    unicode: String,
    int: Number,
+   long: Number,
    bool: Number,
    float: Number,
    types.NoneType: Null,
