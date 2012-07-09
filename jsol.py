@@ -72,7 +72,7 @@ class List(Literal):
 class Dict(Literal):
    def __init__(self, val, env):
       super(Dict, self).__init__(val, env)
-      dict_env = _CopyEnv(env)
+      dict_env = env.copy()
       for (k, v) in self.val.iteritems():
          self.val[k] = _Eval(v, dict_env)
       for v in self.val.values():
@@ -98,7 +98,7 @@ class Null(Literal):
 
 class Function(Type):
    def __init__(self, d, env):
-      self._env = _CopyEnv(env)
+      self._env = env.copy()
       self._params = d.get('params', [])
       self._def = d.get('def', [])
       self._run_env = {}
@@ -108,6 +108,9 @@ class Function(Type):
       env.update(self._env)
       env.update(self._run_env)
       return env
+
+   def copy(self):
+      return self.makeDict()
 
    def json(self):
       return dict([('params', self._params), ('def', self._def)])
@@ -243,11 +246,6 @@ OPS = {
 # Interpreter                                                                 #
 ###############################################################################
 
-def _CopyEnv(env):
-   if isinstance(env, Function):
-      return env.makeDict()
-   return copy.copy(env)
-
 def _ExecList(l, env):
    if len(l) == 0:
       return Lit(None)
@@ -292,7 +290,7 @@ def _Eval(exp, env):
          ret = env[k] = _Eval(v, new_env)
       for k in exp:
          if isinstance(env[k], Function):
-            temp_env = _CopyEnv(env)
+            temp_env = env.copy()
             temp_env.update(env[k]._env)
             env[k]._env = temp_env
       return ret
