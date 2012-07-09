@@ -1,8 +1,8 @@
 JSOL: JavaScript Object Language
 
 JSOL is an interpreted language represented by JSON. Since any JSOL program
-is completely written in JSON, it is very serializable. This allows for easy
-passing of complete programs between applications.
+is completely written in JSON, it is naturally serializable. This allows for
+easy passing of complete programs between applications.
 
 This is the very first version, so there are many improvements to be made.
 
