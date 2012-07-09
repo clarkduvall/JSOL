@@ -20,6 +20,25 @@ import sys
 import types
 
 ###############################################################################
+# Errors                                                                      #
+###############################################################################
+
+class Error(Exception): pass
+
+class FunctionError(Error):
+   def __init__(self, e, n):
+      if isinstance(e, Error):
+         self.names = e.names
+         self.names.append(n)
+         self.e = e.e
+      else:
+         self.names = [n]
+         self.e = e
+
+   def __str__(self):
+      return reduce(lambda x, y: x + y + ': ', self.names) + self.e.__str__()
+
+###############################################################################
 # Types                                                                       #
 ###############################################################################
 
@@ -278,17 +297,24 @@ def _Eval(exp, env):
             env[k]._env = temp_env
       return ret
    if isinstance(exp, list):
-      if exp[0] == 'if':
+      name = exp[0]
+      if name == 'if':
          return _IfBlock(exp[1:], env)
       exp = map(lambda x: _Eval(x, env), exp)
-      return _EvalList(exp, env)
+      try:
+         return _EvalList(exp, env)
+      except Exception as e:
+         raise FunctionError(e, name)
    return env[exp]
 
 def Eval(json_dict, **kwargs):
    env = {}
    json_dict.update(kwargs)
    _Eval(json_dict, env)
-   return env['main'].Eval([])
+   try:
+      return env['main'].Eval([])
+   except FunctionError as e:
+      print e
 
 def main():
    if len(sys.argv) < 2:

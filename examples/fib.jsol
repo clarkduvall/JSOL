@@ -24,7 +24,7 @@
          {"f": ["fib"]},
          {"i": 20},
          ["print", {"lit": "Printing"}, "i", {"lit": "Fibonacci numbers:"}],
-         ["fib_printer", "i", "f"],
+         ["fib_printer", "f", "f"],
          0
       ]
    }
