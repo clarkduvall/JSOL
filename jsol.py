@@ -280,8 +280,9 @@ def _Eval(exp, env):
       return _EvalList(exp, env)
    return env[exp]
 
-def Eval(json_dict):
+def Eval(json_dict, **kwargs):
    env = {}
+   json_dict.update(kwargs)
    _Eval(json_dict, env)
    return env['main'].Eval([])
 

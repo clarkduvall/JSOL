@@ -12,12 +12,21 @@
          }
       ]
    },
+   "fib_printer": {
+      "params": ["i", "f"],
+      "def": [
+         ["if", [">", "i", 0], [
+            ["print", ["f"]],
+            ["fib_printer", ["-", "i", 1], "f"]
+         ]]
+      ]
+   },
    "main": {
       "def": [
-         {"a": -100},
          {"f": ["fib"]},
-         ["print", ["f"], ["f"], ["f"], ["f"], ["f"], ["f"], ["f"], ["f"],
-             ["f"], ["f"], ["f"], ["f"], ["f"], ["f"], ["f"], ["f"]],
+         {"i": 20},
+         ["print", {"lit": "Printing"}, "i", {"lit": "Fibonacci numbers:"}],
+         ["fib_printer", "i", "f"],
          0
       ]
    }
