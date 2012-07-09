@@ -102,6 +102,7 @@ class Function(Type):
       self._params = d.get('params', [])
       self._def = d.get('def', [])
       self._run_env = {}
+      self.val = self
 
    def makeDict(self):
       env = {}
