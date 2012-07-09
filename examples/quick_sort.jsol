@@ -6,8 +6,8 @@
             {"p": ["l", 0]},
             {"lo": ["qsort", ["filter", {"params": ["x"], "def": [["c", "p", "x"]]}, "l"], "c"]},
             {"hi": ["qsort", ["filter", {"params": ["x"], "def": [["c", "x", "p"]]}, "l"], "c"]},
-            ["ins", "lo", ["len", "lo"], "p"],
-            ["+", "lo", "hi"]
+            {"eq": ["filter", {"params": ["x"], "def": [["=", "p", "x"]]}, "l"]},
+            ["+", "lo", "eq", "hi"]
          ], ["l"]]
       ]
    },
