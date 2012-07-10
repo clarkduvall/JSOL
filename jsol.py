@@ -26,17 +26,33 @@ import types
 class Error(Exception): pass
 
 class FunctionError(Error):
-   def __init__(self, e, n):
-      if isinstance(e, Error):
-         self.names = e.names
-         self.names.append(n)
-         self.e = e.e
-      else:
-         self.names = [n]
-         self.e = e
+   def __init__(self, e, name):
+      self.name = name.__str__()
+      self.e = e
 
    def __str__(self):
-      return reduce(lambda x, y: x + y + ': ', self.names) + self.e.__str__()
+      return self.name + ': ' + self.e.__str__()
+
+class UnboundVariableError(Error):
+   def __init__(self, e):
+      self.e = e
+
+   def __str__(self):
+      return 'unbound variable: ' + self.e.__str__()
+
+class JSOLSyntaxError(Error):
+   def __init__(self, msg):
+      self.msg = msg
+
+   def __str__(self):
+      return self.msg
+
+class ReservedWordError(Error):
+   def __init__(self, word):
+      self.word = word
+
+   def __str__(self):
+      return self.word + ' is a reserved word'
 
 ###############################################################################
 # Types                                                                       #
@@ -48,11 +64,11 @@ class Literal(Type):
    def __init__(self, val, env):
       self.val = copy.copy(val)
 
-   def __str__(self):
-      return str(self.val)
-
    def __eq__(self, o):
       return self.val == o.val
+
+   def __str__(self):
+      return str(self.val)
 
    def json(self):
       return dict([('lit', self.val)])
@@ -243,6 +259,8 @@ OPS = {
       'type': _Type
 }
 
+RESERVED = OPS.keys() + ['if', 'params', 'def', 'lit']
+
 ###############################################################################
 # Interpreter                                                                 #
 ###############################################################################
@@ -264,6 +282,7 @@ def _EvalList(exp, env):
       return ret
    if isinstance(exp[0], Function):
       return exp[0].Eval(exp[1:])
+   raise JSOLSyntaxError('not a function name')
 
 def _IfBlock(exp, env):
    for i in range(0, len(exp) - 1, 2):
@@ -288,6 +307,7 @@ def _Eval(exp, env):
       new_env = copy.copy(env)
       ret = Lit(None)
       for (k, v) in exp.iteritems():
+         if k in RESERVED: raise ReservedWordError(k)
          ret = env[k] = _Eval(v, new_env)
       for k in exp:
          if isinstance(env[k], Function):
@@ -304,16 +324,19 @@ def _Eval(exp, env):
          return _EvalList(exp, env)
       except Exception as e:
          raise FunctionError(e, name)
-   return env[exp]
+   try:
+      return env[exp]
+   except Exception as e:
+      raise UnboundVariableError(e)
 
 def Eval(json_dict, **kwargs):
    env = {}
    json_dict.update(kwargs)
-   _Eval(json_dict, env)
    try:
+      _Eval(json_dict, env)
       return env['main'].Eval([])
-   except FunctionError as e:
-      print e
+   except Exception as e:
+      print 'Exception:', e
 
 def main():
    if len(sys.argv) < 2:

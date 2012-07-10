@@ -31,6 +31,9 @@
             ]
          }},
          ["assert", 3, ["rec"]],
+         {"rec2": "rec"},
+         ["assert", 1, ["=", "rec", "rec2"]],
+         ["assert", 0, ["=", "rec", {"def": []}]],
          0
       ]
    }
