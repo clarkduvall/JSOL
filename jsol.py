@@ -120,23 +120,20 @@ class Function(Type):
       self._run_env = {}
       self.val = self
 
-   def makeDict(self):
+   def copy(self):
       env = {}
       env.update(self._env)
       env.update(self._run_env)
       return env
 
-   def copy(self):
-      return self.makeDict()
-
    def json(self):
       return dict([('params', self._params), ('def', self._def)])
 
    def get(self, k, default=None):
-      return self.makeDict().get(k, default)
+      return self.copy().get(k, default)
 
    def __getitem__(self, k):
-      return self.makeDict()[k]
+      return self.copy()[k]
 
    def __setitem__(self, k, v):
       if k in self._run_env or k not in self._env:
