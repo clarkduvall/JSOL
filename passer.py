@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+# This program illustrates how a JSOL program can be sent between applications.
+# A fib function is created in the first Eval, and then sent to the second Eval
+# to be run.
 
 import jsol
 import json
