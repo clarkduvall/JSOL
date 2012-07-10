@@ -67,7 +67,8 @@ Run tests using 'run_tests.sh'
 Future
 
  - Better error handling/messages.
- - More examples
- - Hopefully, the interpreter will be ported to a variety of languages.
+ - More examples.
+ - Documentation.
+ - Porting into other languages (probably starting with JavaScript).
 
 Created by Clark DuVall http://clarkduvall.com
