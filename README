@@ -65,3 +65,5 @@ Future
  - Better error handling/messages.
  - More examples
  - Hopefully, the interpreter will be ported to a variety of languages.
+
+Created by Clark DuVall http://clarkduvall.com
