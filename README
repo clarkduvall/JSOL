@@ -4,6 +4,8 @@ JSOL is an interpreted language represented by JSON. Since any JSOL program
 is completely written in JSON, it is naturally serializable. This allows for
 easy passing of complete programs between applications.
 
+Check out http://jsol.org for an online JSOL playground.
+
 This is the very first version, so there are many improvements to be made.
 
 
