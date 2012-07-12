@@ -1,8 +1,9 @@
 JSOL: JavaScript Object Language
 
 JSOL is an interpreted language represented by JSON. Since any JSOL program
-is completely written in JSON, it is naturally serializable. This allows for
-easy passing of complete programs between applications.
+is completely written in JSON, its data structures and functions can be
+represented (and edited) in any language that has a JSON parser. This allows
+for easy passing of complete programs between applications.
 
 Check out http://jsol.org for an online JSOL playground.
 
@@ -55,8 +56,9 @@ Run examples by typing 'jsol.py examples/<name_of_example>'
    - recursive.jsol - an example of a recursive function
    - quick_sort.jsol - an example of sorting a list by passing in a compare
      function
-   - passer.py - passer.py (in main directory) illustrates passing a JSOL
-     program between applications.
+   - passer.py - ./passer.py (in main directory) illustrates passing a JSOL
+     program between applications
+   - editor.py - ./editor.py shows how a JSOL program can be edited on the fly
 
 
 Testing
