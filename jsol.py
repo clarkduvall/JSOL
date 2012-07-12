@@ -16,6 +16,7 @@
 
 import copy
 import json
+import numbers
 import sys
 import types
 
@@ -292,9 +293,9 @@ def _IfBlock(exp, env):
 def _Eval(exp, env):
    if isinstance(exp, Type):
       return exp
-   if isinstance(exp, (str, unicode)) and exp in OPS:
+   if isinstance(exp, basestring) and exp in OPS:
       return exp
-   if isinstance(exp, (float, int, bool, types.NoneType)):
+   if isinstance(exp, (numbers.Number, types.NoneType)):
       return Lit(exp, env)
    if isinstance(exp, dict):
       if 'lit' in exp:
