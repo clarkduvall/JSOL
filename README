@@ -17,7 +17,7 @@ Features
  - First class functions
  - String, list, number, dictionary, null, and function types
  - Fully representable in JSON.
- - Easily extendable with modules.
+ - Easily extendable with modules (see examples/file_reader.jsol).
 
 
 Syntax
@@ -59,6 +59,8 @@ Run examples by typing 'jsol.py examples/<name_of_example>'
    - recursive.jsol - an example of a recursive function
    - quick_sort.jsol - an example of sorting a list by passing in a compare
      function
+   - file_reader.jsol - prompts the user for a filename and then prints the
+     file to the screen. Uses the 'file' module.
    - passer.py - ./passer.py (in main directory) illustrates passing a JSOL
      program between applications
    - editor.py - ./editor.py shows how a JSOL program can be edited on the fly

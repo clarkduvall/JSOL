@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# File module.
+# Easily create a module by defining functions and an OPS dict.
+
 import os
 
 def _Open(args):
