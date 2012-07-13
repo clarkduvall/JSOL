@@ -14,7 +14,7 @@
    "main": {
       "params": [],
       "def": [
-         ["print", {"lit": "Running filter_test..."}],
+         ["println", {"lit": "Running filter_test..."}],
          {"l": {"lit": [9, -2, 1, 2, -4, 3]}},
          {"p": ["filter", "positive", "l"]},
          {"n": ["filter", "negative", "l"]},

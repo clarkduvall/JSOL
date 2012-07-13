@@ -14,7 +14,7 @@
    },
    "main": {
       "def": [
-         ["print", {"lit": "Running class_test..."}],
+         ["println", {"lit": "Running class_test..."}],
          {"A": ["classA"]},
          ["assert", 5, ["A", {"lit": "a"}]],
          ["assert", 10, [["A", {"lit": "add"}], 5]],

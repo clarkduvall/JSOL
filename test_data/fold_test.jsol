@@ -14,7 +14,7 @@
    "main": {
       "params": [],
       "def": [
-         ["print", {"lit": "Running fold_test..."}],
+         ["println", {"lit": "Running fold_test..."}],
          {"l1": {"lit": [1, 2, 3]}},
          ["assert", 6, {"val": ["fold", "add", "l1"]}],
          ["assert", {"lit": [1, 2, 3]}, "l1"],

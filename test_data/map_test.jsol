@@ -14,7 +14,7 @@
    "main": {
       "params": [],
       "def": [
-         ["print", {"lit": "Running map_test..."}],
+         ["println", {"lit": "Running map_test..."}],
          {"l1": {"lit": [1, 2, 3]}},
          {"l2": ["map", "add1", "l1"]},
          ["assert", {"lit": [1, 2, 3]}, "l1"],

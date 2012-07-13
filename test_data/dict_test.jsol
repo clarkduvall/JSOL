@@ -1,7 +1,7 @@
 {
    "main": {
       "def": [
-         ["print", {"lit": "Running dict_test..."}],
+         ["println", {"lit": "Running dict_test..."}],
          {"d1": {"lit": {
             "a": 10,
             "f": {

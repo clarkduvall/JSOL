@@ -5,6 +5,9 @@
 
 import jsol
 import json
+import file
+
+print file.OPS
 
 with open('examples/part1.jsol') as f:
    fib = jsol.Eval(json.load(f)).json()

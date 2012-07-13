@@ -10,12 +10,12 @@
          }
       ]
    },
-   "fib_printer": {
+   "fib_printlner": {
       "params": ["i", "f"],
       "def": [
          ["if", [">", "i", 0], [
-            ["print", ["f"]],
-            ["fib_printer", ["-", "i", 1], "f"]
+            ["println", ["f"]],
+            ["fib_printlner", ["-", "i", 1], "f"]
          ]]
       ]
    },
@@ -23,8 +23,8 @@
       "def": [
          {"f": ["fib"]},
          {"i": 20},
-         ["print", {"lit": "Printing"}, "i", {"lit": "Fibonacci numbers:"}],
-         ["fib_printer", "i", "f"],
+         ["println", {"lit": "Printing"}, "i", {"lit": "Fibonacci numbers:"}],
+         ["fib_printlner", "i", "f"],
          0
       ]
    }

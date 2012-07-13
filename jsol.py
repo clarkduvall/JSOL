@@ -180,7 +180,7 @@ LITERALS = {
 ###############################################################################
 
 def _Cond(f, l):
-   return Lit(all(f(l[i].val, l[i + 1].val) for i in xrange(len(l) - 1)))
+   return all(f(l[i].val, l[i + 1].val) for i in xrange(len(l) - 1))
 
 def _Add(args):
    return reduce(lambda x, y: Lit(x.val + y.val), args)
@@ -194,16 +194,20 @@ def _Mult(args):
 def _Div(args):
    return reduce(lambda x, y: Lit(x.val / y.val), args)
 
-def _Print(args):
+def _Println(args):
    for arg in args:
       print arg,
    print
+
+def _Print(args):
+   for arg in args:
+      print arg,
 
 def _Eq(args):
    return _Cond(lambda x, y: x == y, args)
 
 def _NEq(args):
-   return Lit(not _Eq(args).val)
+   return not _Eq(args)
 
 def _Lt(args):
    return _Cond(lambda x, y: x < y, args)
@@ -218,7 +222,7 @@ def _GtE(args):
    return _Cond(lambda x, y: x >= y, args)
 
 def _Len(args):
-   return Lit(sum(map(lambda x: len(x.val), args)))
+   return sum(map(lambda x: len(x.val), args))
 
 def _Ins(args):
    args[0].val.insert(args[1].val, args[2])
@@ -228,33 +232,39 @@ def _Del(args):
    return args[0].val.pop(args[1].val)
 
 def _Cut(args):
-   return Lit([Lit(args[0].val[:args[1].val]), Lit(args[0].val[args[1].val:])])
+   return [Lit(args[0].val[:args[1].val]), Lit(args[0].val[args[1].val:])]
 
 def _Map(args):
-   return Lit(map(lambda x: args[0].Eval([x]), args[1].val))
+   return map(lambda x: args[0].Eval([x]), args[1].val)
 
 def _Fold(args):
-   return Lit(reduce(lambda x, y: args[0].Eval([x, y]), args[1].val))
+   return reduce(lambda x, y: args[0].Eval([x, y]), args[1].val)
 
 def _Filter(args):
-   return Lit(filter(lambda x: args[0].Eval([x]).val, args[1].val))
+   return filter(lambda x: args[0].Eval([x]).val, args[1].val)
 
 def _Assert(args):
-   if not _Eq(args).val:
+   if not _Eq(args):
       print 'Assert failed:', args[0], args[1]
 
 def _Round(args):
-   return Lit(int(round(args[0].val)))
+   return int(round(args[0].val))
 
 def _Type(args):
-   return Lit(TYPES[type(args[0])])
+   return TYPES[type(args[0])]
+
+def _Import(args):
+   global OPS
+   for arg in args:
+      module = __import__(arg.val)
+      OPS.update(module.OPS)
 
 OPS = {
       '+': _Add, '-': _Sub, '*': _Mult, '/': _Div, 'print': _Print,
-      '=': _Eq, '!': _NEq, '<': _Lt, '>': _Gt, '<=': _LtE, '>=': _GtE,
-      'len': _Len, 'ins': _Ins, 'del': _Del, 'cut': _Cut, 'map': _Map,
-      'fold': _Fold, 'filter': _Filter, 'assert': _Assert, 'round': _Round,
-      'type': _Type
+      'println': _Println, '=': _Eq, '!': _NEq, '<': _Lt, '>': _Gt, '<=': _LtE,
+      '>=': _GtE, 'len': _Len, 'ins': _Ins, 'del': _Del, 'cut': _Cut,
+      'map': _Map, 'fold': _Fold, 'filter': _Filter, 'assert': _Assert,
+      'round': _Round, 'type': _Type, 'import': _Import
 }
 
 RESERVED = OPS.keys() + ['if', 'params', 'def', 'lit']
@@ -272,7 +282,7 @@ def _ExecList(l, env):
 
 def _EvalList(exp, env):
    if exp[0] in OPS:
-      return OPS[exp[0]](exp[1:])
+      return Lit(OPS[exp[0]](exp[1:]))
    if isinstance(exp[0], (Dict, List, String)):
       if len(exp) == 2:
          return Lit(exp[0].val[exp[1].val])

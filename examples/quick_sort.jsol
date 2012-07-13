@@ -13,9 +13,9 @@
    },
    "main": {
       "def": [
-         ["print", {"lit": "Unsorted:          "}, {"l": {"lit": [2, 23, 6, 1, 26, 923, 5, 0, 92]}}],
-         ["print", {"lit": "Sorted high to low:"}, ["qsort", "l", "<"]],
-         ["print", {"lit": "Sorted low to high:"}, ["qsort", "l", ">"]],
+         ["println", {"lit": "Unsorted:          "}, {"l": {"lit": [2, 23, 6, 1, 26, 923, 5, 0, 92]}}],
+         ["println", {"lit": "Sorted high to low:"}, ["qsort", "l", "<"]],
+         ["println", {"lit": "Sorted low to high:"}, ["qsort", "l", ">"]],
          0
       ]
    }

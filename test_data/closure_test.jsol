@@ -1,7 +1,7 @@
 {
    "main": {
       "def": [
-         ["print", {"lit": "Running closure_test..."}],
+         ["println", {"lit": "Running closure_test..."}],
          {"a": 5},
          {"f": {
             "params": [],

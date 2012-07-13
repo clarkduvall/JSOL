@@ -1,3 +1,3 @@
 #!/bin/sh
 
-jsol.py test_data/*
+jsol.py test_data/*_test.jsol
