@@ -15,8 +15,9 @@ Features
 
  - Closures
  - First class functions
- - string, list, number, dictionary, null, and function types
- - fully representable in JSON.
+ - String, list, number, dictionary, null, and function types
+ - Fully representable in JSON.
+ - Easily extendable with modules.
 
 
 Syntax
@@ -26,6 +27,7 @@ Syntax
     - '"add": {...}'                 -> function definition
     - '["add", "a", "b", "a"]'       -> function call
     - '{"lit": "hello"}'             -> string literal
+    - '["import", {"lit": "file"}]'  -> import a module
 
    Lists
     - '{"lit": [1, 2, 3]}'           -> list literal

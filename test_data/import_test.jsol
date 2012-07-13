@@ -5,6 +5,7 @@
          ["import", {"lit": "file"}],
          {"f": ["open", {"lit": "test_data/import_test.jsol"}]},
          ["assert", {"lit": "{\n   \"main"}, ["read", "f", 10]],
+         ["close", "f"],
          0
       ]
    }

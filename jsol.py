@@ -201,7 +201,8 @@ def _Println(args):
 
 def _Print(args):
    for arg in args:
-      print arg,
+      sys.stdout.write(arg.__str__())
+   sys.stdout.flush()
 
 def _Eq(args):
    return _Cond(lambda x, y: x == y, args)

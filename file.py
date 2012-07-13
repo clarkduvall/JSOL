@@ -15,7 +15,7 @@
 import os
 
 def _Open(args):
-   return os.open(args[0].val, os.O_RDWR)
+   return os.open(args[0].val.strip(), os.O_RDWR)
 
 def _Read(args):
    return os.read(args[0].val, args[1].val)
