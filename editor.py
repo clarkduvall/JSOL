@@ -24,7 +24,7 @@ import json
 with open('examples/fib.jsol') as f:
    fib = json.load(f)
 
-fib['main']['def'].insert(0, ['print', {'lit': 'Let\'s start fib at 8!'}])
+fib['main']['def'].insert(0, ['println', {'lit': 'Let\'s start fib at 8!'}])
 fib['fib']['def'][0]['a'] = 5
 fib['fib']['def'][0]['b'] = 8
 
