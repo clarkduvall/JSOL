@@ -1,16 +1,17 @@
 {
-   "counter": 25,
+   "counter": 100,
    "rec": {
       "params": [],
       "def": [
-         ["println", {"lit": "hi"}, "counter"],
-         ["if", [">", {"counter": ["-", "counter", 1]}, 0], [["rec"]]],
-         0
+         ["print", "counter", {"lit": " "}],
+         ["if", [">", {"counter": ["-", "counter", 1]}, 0], [["rec"]]]
       ]
    },
    "main": {
       "def": [
-         ["rec"]
+         ["println", {"lit": "Counting down from"}, "counter"],
+         ["rec"],
+         ["println"]
       ]
    }
 }

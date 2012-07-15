@@ -114,6 +114,33 @@ class Null(Literal):
       return 'Null'
 
 class Function(Type):
+   class _FunctionEnv(object):
+      def __init__(self, env, run_env, og_func):
+         self.val = og_func
+         self._env = env
+         self._run_env = run_env
+
+      def copy(self):
+         env = {}
+         env.update(self._env)
+         env.update(self._run_env)
+         return env
+
+      def __eq__(self, o):
+         return o == self.val
+
+      def get(self, k, default=None):
+         return self.copy().get(k, default)
+
+      def __getitem__(self, k):
+         return self.copy()[k]
+
+      def __setitem__(self, k, v):
+         if k in self._run_env or k not in self._env:
+            self._run_env[k] = v
+         else:
+            self._env[k] = v
+
    def __init__(self, d, env):
       self._env = env.copy()
       self._params = d.get('params', [])
@@ -121,31 +148,13 @@ class Function(Type):
       self._run_env = {}
       self.val = self
 
-   def copy(self):
-      env = {}
-      env.update(self._env)
-      env.update(self._run_env)
-      return env
-
    def json(self):
       return dict([('params', self._params), ('def', self._def)])
 
-   def get(self, k, default=None):
-      return self.copy().get(k, default)
-
-   def __getitem__(self, k):
-      return self.copy()[k]
-
-   def __setitem__(self, k, v):
-      if k in self._run_env or k not in self._env:
-         self._run_env[k] = v
-      else:
-         self._env[k] = v
-
-   def Eval(self, args):
-      self = copy.copy(self)
-      self._run_env = dict(zip(self._params, args))
-      return _ExecList(self._def, self)
+   def Eval(self, args, tail_pos=False):
+      return _ExecList(
+          self._def,
+          self._FunctionEnv(self._env, dict(zip(self._params, args)), self))
 
 def Lit(val, env=None):
    if env == None:
@@ -279,9 +288,9 @@ def _ExecList(l, env):
       return Lit(None)
    for exp in l[:-1]:
       _Eval(exp, env)
-   return _Eval(l[-1], env)
+   return _Eval(l[-1], env, True)
 
-def _EvalList(exp, env):
+def _EvalList(exp, env, tail_pos=False):
    if exp[0] in OPS:
       return Lit(OPS[exp[0]](exp[1:]))
    if isinstance(exp[0], (Dict, List, String)):
@@ -290,10 +299,10 @@ def _EvalList(exp, env):
       ret = exp[0].val[exp[1].val] = exp[2]
       return ret
    if isinstance(exp[0], Function):
-      return exp[0].Eval(exp[1:])
+      return exp[0].Eval(exp[1:], tail_pos)
    raise JSOLSyntaxError('not a function name')
 
-def _IfBlock(exp, env):
+def _IfBlock(exp, env, tail_pos=False):
    for i in range(0, len(exp) - 1, 2):
       if _Eval(exp[i], env).val:
          return _ExecList(exp[i + 1], env)
@@ -301,7 +310,7 @@ def _IfBlock(exp, env):
       return _ExecList(exp[-1], env)
    return Lit(None)
 
-def _Eval(exp, env):
+def _Eval(exp, env, tail_pos=False):
    if isinstance(exp, Type):
       return exp
    if isinstance(exp, basestring) and exp in OPS:
@@ -327,10 +336,15 @@ def _Eval(exp, env):
    if isinstance(exp, list):
       name = exp[0]
       if name == 'if':
-         return _IfBlock(exp[1:], env)
+         return _IfBlock(exp[1:], env, tail_pos)
       exp = map(lambda x: _Eval(x, env), exp)
+      if exp[0] == env and tail_pos:
+         return (exp, env)
       try:
-         return _EvalList(exp, env)
+         result = _EvalList(exp, env, tail_pos)
+         while isinstance(result, tuple):
+            result = _EvalList(result[0], result[1], tail_pos)
+         return result
       except Exception as e:
          raise FunctionError(e, name)
    try:
