@@ -354,7 +354,8 @@ def _Eval(exp, env, tail_pos=False):
 
 def Eval(json_dict, **kwargs):
    env = {}
-   json_dict.update(kwargs)
+   if kwargs:
+      json_dict.update(kwargs)
    try:
       _Eval(json_dict, env)
       return env['main'].Eval([])
