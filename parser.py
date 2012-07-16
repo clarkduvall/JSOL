@@ -124,7 +124,7 @@ def _Parse(code):
          if buf == 'if':
             return _ParseIf(code[i - 1:])
          return (code[i - 1:], _GetNum(buf))
-      if c == '|':
+      if c == ':':
          rest, result = _Parse(code[i:])
          return (rest, { buf: result })
       if c == '"':

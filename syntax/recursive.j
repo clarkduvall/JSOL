@@ -1,11 +1,11 @@
-counter|100
-rec|def() {
+counter:100
+rec:def() {
    print(counter " ")
-   if >(counter|-(counter 1) 0) {
+   if >(counter:-(counter 1) 0) {
       rec()
    }
 }
-main|def() {
+main:def() {
    println("Counting down from" counter)
    rec()
    println()
