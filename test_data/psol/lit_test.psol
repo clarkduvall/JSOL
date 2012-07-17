@@ -1,0 +1,10 @@
+main:def() {
+   println("Running lit_test...")
+   assert([1 2 3] +([1 2] [3]))
+   assert("hello world!" s:+("hello " "world!"))
+   assert("e" s(1))
+   assert(["hello " "world!"] cut(s 6))
+   assert(5 +(2 3))
+   assert(4 len([1 2 3 4]))
+   0
+}

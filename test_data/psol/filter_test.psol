@@ -1,0 +1,18 @@
+positive:def(a) {
+   >(a 0)
+}
+
+negative:def(a) {
+   <(a 0)
+}
+
+main:def() {
+   println("Running filter_test...")
+   l:[9 -2 1 2 -4 3]
+   p:filter(positive l)
+   n:filter(negative l)
+   assert([9 -2 1 2 -4 3] l)
+   assert([9 1 2 3] p)
+   assert([-2 -4] n)
+   0
+}

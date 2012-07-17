@@ -1,0 +1,34 @@
+main:def() {
+   println("Running dict_test...")
+   d1:{
+      a:10
+      f:def() { a }
+   }
+   d2:{
+      l:[1 2 3]
+      d:{ a:1 x:20 }
+      set_a:def(a_) {
+         d("a" a_)
+      }
+      get_a:def() {
+         d("a")
+      }
+      f:def() {
+         +(d("x") d("a"))
+      }
+   }
+   assert(10 d1("f")())
+   assert(10 d1("a"))
+   assert(9 d1("a" 9))
+   assert(9 d1("f")())
+   assert(2 d1("b" 2))
+   assert(2 d1("b"))
+   assert(21 d2("f")())
+   assert(1 d2("get_a")())
+   assert(32 d2("set_a")(32))
+   assert(32 d2("get_a")())
+   assert([1 2 3] d2("l"))
+   assert(5 ins(d2("l") 0 5))
+   assert(4 len(d2("l")))
+   0
+}

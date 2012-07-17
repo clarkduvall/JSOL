@@ -1,0 +1,8 @@
+main:def() {
+   println("Running import_test...")
+   import("file")
+   f:open("test_data/jsol/import_test.jsol")
+   assert("{\n   \"main" read(f 10))
+   close(f)
+   0
+}

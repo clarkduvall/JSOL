@@ -1,0 +1,18 @@
+classA:def() {
+   {
+      a:5
+      add:def(x) {
+         +(a x)
+      }
+   }
+}
+
+main:def() {
+   println("Running class_test...")
+   A:classA()
+   assert(5, A("a"))
+   assert(10 A("add")(5))
+   A("a" 10)
+   assert(15 A("add")(5))
+   0
+}

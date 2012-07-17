@@ -32,6 +32,9 @@ def _ParseString(code):
       if code[i] == '"' and code[i - 1] != '\\':
          return (code[i + 1:], {'lit': buf})
       if code[i] != '\\' or code[i - 1] == '\\':
+         if code[i - 1] == '\\' and code[i] == 'n':
+            buf += '\n'
+            continue
          buf += code[i]
 
 def _GetParens(code):
@@ -105,6 +108,8 @@ def _ParseDict(code):
    return (code, {'lit': d})
 
 def _GetNum(num):
+   if num == 'null':
+      return None
    if num.isdigit():
       return int(num)
    try:
@@ -132,7 +137,10 @@ def _Parse(code):
       if c == '(':
          if buf == 'def':
             return _ParseFunction(code[i:])
-         return _ParseCall(code[i:], buf)
+         code, call = _ParseCall(code[i:], buf)
+         while len(code.lstrip()) and code.lstrip()[0] == '(':
+            code, call = _ParseCall(code.lstrip()[1:], call)
+         return (code, call)
       if c == '[':
          return _ParseList(code[i:])
       if c == '{':
@@ -149,5 +157,6 @@ def Parse(code):
    return d
 
 if __name__ == '__main__':
-   with open(sys.argv[1], 'r') as f:
-      jsol.Eval(Parse(f.read()))
+   for arg in sys.argv[1:]:
+      with open(arg, 'r') as f:
+         jsol.Eval(Parse(f.read()))

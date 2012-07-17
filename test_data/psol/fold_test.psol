@@ -1,0 +1,18 @@
+add:def(a b) {
+   +(a b)
+}
+
+join:def(a b) {
+   +(a " " b)
+}
+
+main:def() {
+   println("Running fold_test...")
+   l1:[1 2 3]
+   assert(6 val:fold(add l1))
+   assert([1 2 3] l1)
+   l2:["bob" "is" "cool"]
+   assert("bob is cool" fold(join l2))
+   assert(["bob" "is" "cool"] l2)
+   0
+}

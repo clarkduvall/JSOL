@@ -1,0 +1,21 @@
+main:def() {
+   println("Running closure_test...")
+   a:5
+   f:def() {
+      a:+(a a)
+   }
+   b:10
+   f2:def() {
+      def() { b }
+   }
+   b:-1
+   f3:f2()
+   assert(10 f3())
+   assert(5 a)
+   assert(10 f())
+   assert(5 a)
+   assert(20 f())
+   assert(5 a)
+   assert(40 f())
+   0
+}

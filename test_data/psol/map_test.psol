@@ -1,0 +1,14 @@
+add1:def(a) { +(a 1) }
+
+addB:def(a) { +(a "B") }
+
+main:def() {
+   println("Running map_test...")
+   l1:[1 2 3]
+   l2:map(add1 l1)
+   assert([1 2 3] l1)
+   assert([2 3 4] l2)
+   l3:["bob" "is" "here"]
+   assert(["bobB" "isB" "hereB"] map(addB l3))
+   0
+}
