@@ -22,12 +22,12 @@ import jsol
 import json
 import parser
 
-with open('syntax/part1.j') as f:
+with open('examples/psol/part1.psol') as f:
    fib = jsol.Eval(parser.Parse(f.read())).json()
 
 print 'JSOL created!:'
 print json.dumps(fib, indent=3)
 print 'Passing to other instance...'
 
-with open('syntax/part2.j') as f:
+with open('examples/psol/part2.psol') as f:
    jsol.Eval(parser.Parse(f.read()), argv=fib)

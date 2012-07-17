@@ -21,7 +21,7 @@
 import jsol
 import json
 
-with open('examples/fib.jsol') as f:
+with open('examples/jsol/fib.jsol') as f:
    fib = json.load(f)
 
 fib['main']['def'].insert(0, ['println', {'lit': 'Let\'s start fib at 8!'}])
