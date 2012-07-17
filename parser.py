@@ -15,7 +15,7 @@
 # limitations under the License.
 
 # This is a parser for a new syntax that can be used to write JSOL. Examples
-# of this can be found in the syntax/ folder.
+# of this can be found in the examples/psol directory.
 # I haven't had a chance to clean this up, so right now its UGLY.
 
 import jsol
