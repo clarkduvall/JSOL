@@ -6,7 +6,11 @@ represented (and edited) in any language that has a JSON parser and JSOL
 interpreter. This allows for easy passing of complete programs between
 applications.
 
-Check out http://jsol.org for an online JSOL playground.
+PSOL is a cleaner syntax for JSOL. A PSOL program can be parsed into JSOL
+using parser.py. Examples of PSOL can be found in the examples/psol
+directory, or in test_data/psol.
+
+Check out http://jsol.org for an online JSOL/PSOL playground.
 
 This is the very first version, so there are many improvements to be made.
 
@@ -52,8 +56,8 @@ Syntax
 
 Examples
 
-The examples/ directory has some example programs.
-Run examples by typing 'jsol.py examples/<name_of_example>'
+The examples/jsol directory has some example programs.
+Run examples by typing 'jsol.py examples/jsol/<name_of_example>'
 
    - fib.jsol - outputs the Fibonacci sequence using a closure
    - recursive.jsol - an example of a recursive function
@@ -64,6 +68,9 @@ Run examples by typing 'jsol.py examples/<name_of_example>'
    - passer.py - ./passer.py (in main directory) illustrates passing a JSOL
      program between applications
    - editor.py - ./editor.py shows how a JSOL program can be edited on the fly
+
+Most of these examples also have a PSOL version in examples/psol.
+Run these by typing 'parser.py examples/psol/<name_of_example>'
 
 
 Testing
